@@ -1,0 +1,1362 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>Fortran Best Practices &#8212; Fortran90 1.0 documentation</title>
+    <link rel="stylesheet" href="../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Python Fortran Rosetta Stone" href="rosetta.html" />
+    <link rel="prev" title="About" href="about.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="rosetta.html" title="Python Fortran Rosetta Stone"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="about.html" title="About"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Fortran90 1.0 documentation</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="fortran-best-practices">
+<h1>Fortran Best Practices<a class="headerlink" href="#fortran-best-practices" title="Permalink to this headline">¶</a></h1>
+<p>This page collects a modern canonical way of doing things in Fortran. It is meant to be short, and it is assumed that you already know how to program in other languages (like Python, C/C++, …) and also know Fortran syntax a bit. Some things in Fortran are obsolete, so this guide only shows the “one correct/canonical modern way” how to do things.</p>
+<p>Summary of the language: <a class="reference external" href="http://www.cs.umbc.edu/~squire/fortranclass/summary.shtml">http://www.cs.umbc.edu/~squire/fortranclass/summary.shtml</a></p>
+<p>Language features are explained at: <a class="reference external" href="http://en.wikipedia.org/wiki/Fortran_language_features">http://en.wikipedia.org/wiki/Fortran_language_features</a></p>
+<p>The best resource is a recent Fortran standard, for example the Fortran 2003 standard: <a class="reference external" href="http://www.j3-fortran.org/doc/year/04/04-007.pdf">http://www.j3-fortran.org/doc/year/04/04-007.pdf</a></p>
+<div class="section" id="fortran-style-guide">
+<h2>Fortran Style Guide<a class="headerlink" href="#fortran-style-guide" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="naming-convention">
+<h3>Naming Convention<a class="headerlink" href="#naming-convention" title="Permalink to this headline">¶</a></h3>
+<p>Ultimately this is a matter of preference. Here is a style guide that we like
+and that seems to be prevalent in most scientific codes (as well as the Fortran
+standard library) and you are welcome to follow it.</p>
+<ol class="arabic simple">
+<li><p>Use lowercase for all Fortran constructs (<code class="docutils literal notranslate"><span class="pre">do</span></code>, <code class="docutils literal notranslate"><span class="pre">subroutine</span></code>, <code class="docutils literal notranslate"><span class="pre">module</span></code>,
+…).</p></li>
+<li><p>Follow short mathematical notation for mathematical variables/functions
+(<code class="docutils literal notranslate"><span class="pre">Ylm</span></code>, <code class="docutils literal notranslate"><span class="pre">Gamma</span></code>, <code class="docutils literal notranslate"><span class="pre">gamma</span></code>, <code class="docutils literal notranslate"><span class="pre">Enl</span></code>, <code class="docutils literal notranslate"><span class="pre">Rnl</span></code>, …).</p></li>
+<li><p>For other names use all lowercase: try to keep names to one or two
+syllables; if more are required, use underscores to clarify (<code class="docutils literal notranslate"><span class="pre">sortpair</span></code>,
+<code class="docutils literal notranslate"><span class="pre">whitechar</span></code>, <code class="docutils literal notranslate"><span class="pre">meshexp</span></code>, <code class="docutils literal notranslate"><span class="pre">numstrings</span></code>, <code class="docutils literal notranslate"><span class="pre">linspace</span></code>, <code class="docutils literal notranslate"><span class="pre">meshgrid</span></code>,
+<code class="docutils literal notranslate"><span class="pre">argsort</span></code>, <code class="docutils literal notranslate"><span class="pre">spline</span></code>, <code class="docutils literal notranslate"><span class="pre">spline_interp</span></code>, <code class="docutils literal notranslate"><span class="pre">spline_interpolate</span></code>,
+<code class="docutils literal notranslate"><span class="pre">stoperr</span></code>, <code class="docutils literal notranslate"><span class="pre">stop_error</span></code>, <code class="docutils literal notranslate"><span class="pre">meshexp_der</span></code>).</p></li>
+</ol>
+<p>For example “spline interpolation” can be shortened to
+<code class="docutils literal notranslate"><span class="pre">spline_interpolation</span></code>, <code class="docutils literal notranslate"><span class="pre">spline_interpolate</span></code>, <code class="docutils literal notranslate"><span class="pre">spline_interp</span></code>,
+<code class="docutils literal notranslate"><span class="pre">spline</span></code>, but not to <code class="docutils literal notranslate"><span class="pre">splineint</span></code> (“int” could mean integration, integer,
+etc. — too much ambiguity, even in the clear context of a computational
+code). This is in contrast to <code class="docutils literal notranslate"><span class="pre">get_argument()</span></code> where <code class="docutils literal notranslate"><span class="pre">getarg()</span></code> is
+perfectly clean and clear.</p>
+<p>The above are general guidelines.  In general, choosing the right name
+certainly depends on the word being truncated as to whether the first syllable
+is sufficient. Usually it is but clearly not always. Thus some thought should
+go into step “try to keep names to 2 syllables or less” since it can really
+affect the indicativeness and simplicity. Simple consistent naming rules are a
+real help in this regard – for both collaboration and for one’s own sanity
+when going back to some old code you haven’t seen in while.</p>
+</div>
+<div class="section" id="indentation">
+<h3>Indentation<a class="headerlink" href="#indentation" title="Permalink to this headline">¶</a></h3>
+<p>Use 4 spaces indentation (this is again a matter of preference as
+some people prefer 2 or 3 spaces).</p>
+</div>
+<div class="section" id="comparison-to-other-languages">
+<h3>Comparison to Other Languages<a class="headerlink" href="#comparison-to-other-languages" title="Permalink to this headline">¶</a></h3>
+<p>On the other hand, in most of the rest of the programming world, where the main
+focus is, in one form or another, on defining and using large sets of complex
+objects, with tons of properties and behaviors, known only in the code in which
+they are defined (as opposed to defined by the same  notation throughout the
+literature), it makes more sense to use longer, more descriptive names. The
+naming conventions one sees used in more general-purpose languages such as C++
+and Python, therefore, are perfectly consistent with their more general-purpose
+missions. But Fortran has a different mission (numerical scientific computing).</p>
+</div>
+</div>
+<div class="section" id="floating-point-numbers">
+<span id="id1"></span><h2>Floating Point Numbers<a class="headerlink" href="#floating-point-numbers" title="Permalink to this headline">¶</a></h2>
+<p>Somewhere create and export a parameter <code class="docutils literal notranslate"><span class="pre">dp</span></code>:</p>
+<div class="highlight-fortran notranslate"><div class="highlight"><pre><span></span><span class="kt">integer</span><span class="p">,</span> <span class="k">parameter</span><span class="kd">::</span> <span class="n">dp</span><span class="o">=</span><span class="nb">kind</span><span class="p">(</span><span class="mf">0.d0</span><span class="p">)</span>                   <span class="c">! double precision</span>
+</pre></div>
+</div>
+<p>and declare floats as:</p>
+<div class="highlight-fortran notranslate"><div class="highlight"><pre><span></span><span class="kt">real</span><span class="p">(</span><span class="n">dp</span><span class="p">)</span> <span class="kd">::</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span>
+</pre></div>
+</div>
+<p>Always write all floating point constants with the <code class="docutils literal notranslate"><span class="pre">_dp</span></code> suffix:</p>
+<div class="highlight-fortran notranslate"><div class="highlight"><pre><span></span><span class="mf">1.0_dp</span><span class="p">,</span> <span class="mf">3.5_dp</span><span class="p">,</span> <span class="mf">1.34e8_dp</span>
+</pre></div>
+</div>
+<p>and never any other way (see also the gotcha
+<a class="reference internal" href="gotchas.html#floating-point-numbers-gotcha"><span class="std std-ref">Floating Point Numbers</span></a>).
+Omitting the dot in the literal constant is also incorrect.</p>
+<p>To print floating point double precision
+numbers without losing precision, use the <code class="docutils literal notranslate"><span class="pre">(es23.16)</span></code> format (see
+<a class="reference external" href="http://stackoverflow.com/questions/6118231/why-do-i-need-17-significant-digits-and-not-16-to-represent-a-double/">http://stackoverflow.com/questions/6118231/why-do-i-need-17-significant-digits-and-not-16-to-represent-a-double/</a>).</p>
+<p>It is safe to assign integers to floating point numbers without losing
+accuracy:</p>
+<div class="highlight-fortran notranslate"><div class="highlight"><pre><span></span><span class="kt">real</span><span class="p">(</span><span class="n">dp</span><span class="p">)</span> <span class="kd">::</span> <span class="n">a</span>
+<span class="n">a</span> <span class="o">=</span> <span class="mi">3</span>
+</pre></div>
+</div>
+<p>In order to impose floating point division (as opposed to integer division
+<code class="docutils literal notranslate"><span class="pre">1/2</span></code> equal to <code class="docutils literal notranslate"><span class="pre">0</span></code>), one can convert the integer to a floating point number
+by:</p>
+<div class="highlight-fortran notranslate"><div class="highlight"><pre><span></span><span class="kt">real</span><span class="p">(</span><span class="n">dp</span><span class="p">)</span> <span class="kd">::</span> <span class="n">a</span>
+<span class="n">a</span> <span class="o">=</span> <span class="kt">real</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">dp</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span>       <span class="c">! &#39;a&#39; is equal to 0.5_dp</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="integer-division">
+<h2>Integer Division<a class="headerlink" href="#integer-division" title="Permalink to this headline">¶</a></h2>
+<p>Just like in Python 2.x or C, when doing things like <code class="docutils literal notranslate"><span class="pre">(N-1)/N</span></code> where <code class="docutils literal notranslate"><span class="pre">N</span></code> is an integer and you want a floating point division, force the compiler to use floats at the right hand side, for example by:</p>
+<div class="highlight-fortran notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="n">N</span> <span class="o">-</span> <span class="mf">1.0_dp</span><span class="p">)</span><span class="o">/</span><span class="n">N</span>
+</pre></div>
+</div>
+<p>As long as one of the <code class="docutils literal notranslate"><span class="pre">/</span></code> operands is a float, a floating point division will be used.</p>
+</div>
+<div class="section" id="modules-and-programs">
+<span id="modules"></span><h2>Modules and Programs<a class="headerlink" href="#modules-and-programs" title="Permalink to this headline">¶</a></h2>
+<p>Only use modules and programs. Always setup a module in the following way:</p>
+<div class="highlight-fortran notranslate"><div class="highlight"><pre><span></span><span class="k">module </span><span class="n">ode1d</span>
+<span class="k">use </span><span class="n">types</span><span class="p">,</span> <span class="n">only</span><span class="p">:</span> <span class="n">dp</span><span class="p">,</span> <span class="n">pi</span>
+<span class="k">use </span><span class="n">utils</span><span class="p">,</span> <span class="n">only</span><span class="p">:</span> <span class="n">stop_error</span>
+<span class="k">implicit none</span>
+<span class="k">private</span>
+<span class="k">public </span><span class="n">integrate</span><span class="p">,</span> <span class="n">normalize</span><span class="p">,</span> <span class="n">parsefunction</span><span class="p">,</span> <span class="n">get_val</span><span class="p">,</span> <span class="n">rk4step</span><span class="p">,</span> <span class="n">eulerstep</span><span class="p">,</span> <span class="p">&amp;</span>
+        <span class="n">rk4step2</span><span class="p">,</span> <span class="n">get_midpoints</span><span class="p">,</span> <span class="n">rk4_integrate</span><span class="p">,</span> <span class="n">rk4_integrate_inward</span><span class="p">,</span> <span class="p">&amp;</span>
+        <span class="n">rk4_integrate_inward2</span><span class="p">,</span> <span class="n">rk4_integrate3</span><span class="p">,</span> <span class="n">rk4_integrate4</span><span class="p">,</span> <span class="p">&amp;</span>
+        <span class="n">rk4_integrate_inward4</span>
+
+<span class="k">contains</span>
+
+<span class="k">subroutine </span><span class="n">get_val</span><span class="p">(...)</span>
+<span class="p">...</span>
+<span class="k">end subroutine</span>
+<span class="p">...</span>
+
+<span class="k">end module</span>
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">implicit</span> <span class="pre">none</span></code> statement works for the whole module (so you don’t need to worry about it). By keeping the <code class="docutils literal notranslate"><span class="pre">private</span></code> empty, all your subroutines/data types will be private to the module by default. Then you export things by putting it into the <code class="docutils literal notranslate"><span class="pre">public</span></code> clause.</p>
+<p>Setup programs in the following way:</p>
+<div class="highlight-fortran notranslate"><div class="highlight"><pre><span></span><span class="k">program </span><span class="n">uranium</span>
+<span class="k">use </span><span class="n">fmesh</span><span class="p">,</span> <span class="n">only</span><span class="p">:</span> <span class="n">mesh_exp</span>
+<span class="k">use </span><span class="n">utils</span><span class="p">,</span> <span class="n">only</span><span class="p">:</span> <span class="n">stop_error</span><span class="p">,</span> <span class="n">dp</span>
+<span class="k">use </span><span class="n">dft</span><span class="p">,</span> <span class="n">only</span><span class="p">:</span> <span class="n">atom</span>
+<span class="k">implicit none</span>
+
+<span class="kt">integer</span><span class="p">,</span> <span class="k">parameter</span> <span class="kd">::</span> <span class="n">Z</span> <span class="o">=</span> <span class="mi">92</span>
+<span class="kt">real</span><span class="p">(</span><span class="n">dp</span><span class="p">),</span> <span class="k">parameter</span> <span class="kd">::</span> <span class="n">r_min</span> <span class="o">=</span> <span class="mf">8e-9_dp</span><span class="p">,</span> <span class="n">r_max</span> <span class="o">=</span> <span class="mi">5</span><span class="mf">0.0_dp</span><span class="p">,</span> <span class="n">a</span> <span class="o">=</span> <span class="mf">1e7_dp</span>
+<span class="p">...</span>
+<span class="k">print</span> <span class="o">*</span><span class="p">,</span> <span class="s2">&quot;I am running&quot;</span>
+<span class="k">end program</span>
+</pre></div>
+</div>
+<p>Notice the “explicit imports” (using Python terminology) in the <code class="docutils literal notranslate"><span class="pre">use</span></code> statements. You can also use “implicit imports” like:</p>
+<div class="highlight-fortran notranslate"><div class="highlight"><pre><span></span><span class="k">use </span><span class="n">fmesh</span>
+</pre></div>
+</div>
+<p>But just like in Python, this should be avoided (“explicit is better than implicit”) in most cases.</p>
+</div>
+<div class="section" id="arrays">
+<h2>Arrays<a class="headerlink" href="#arrays" title="Permalink to this headline">¶</a></h2>
+<p>When passing arrays in and out of a subroutine/function, use
+the following pattern for 1D arrays (it is called <cite>assumed-shape</cite>):</p>
+<div class="highlight-fortran notranslate"><div class="highlight"><pre><span></span><span class="k">subroutine </span><span class="n">f</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
+<span class="kt">real</span><span class="p">(</span><span class="n">dp</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">out</span><span class="p">)</span> <span class="kd">::</span> <span class="n">r</span><span class="p">(:)</span>
+<span class="kt">integer</span> <span class="kd">::</span> <span class="n">n</span><span class="p">,</span> <span class="n">i</span>
+<span class="n">n</span> <span class="o">=</span> <span class="n">size</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
+<span class="k">do </span><span class="n">i</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">n</span>
+    <span class="n">r</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">=</span> <span class="mf">1.0_dp</span> <span class="o">/</span> <span class="n">i</span><span class="o">**</span><span class="mi">2</span>
+<span class="n">enddo</span>
+<span class="k">end subroutine</span>
+</pre></div>
+</div>
+<p>2D arrays:</p>
+<div class="highlight-fortran notranslate"><div class="highlight"><pre><span></span><span class="k">subroutine </span><span class="n">g</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+<span class="kt">real</span><span class="p">(</span><span class="n">dp</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span> <span class="kd">::</span> <span class="n">A</span><span class="p">(:,</span> <span class="p">:)</span>
+<span class="p">...</span>
+<span class="k">end subroutine</span>
+</pre></div>
+</div>
+<p>and call it like this:</p>
+<div class="highlight-fortran notranslate"><div class="highlight"><pre><span></span><span class="kt">real</span><span class="p">(</span><span class="n">dp</span><span class="p">)</span> <span class="kd">::</span> <span class="n">r</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+<span class="k">call </span><span class="n">f</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>No array copying is done above. It has the following
+advantages:</p>
+<ul class="simple">
+<li><p>the shape and size of the array is passed in automatically</p></li>
+<li><p>the shape is checked at compile time, the size optionally at runtime</p></li>
+<li><p>allows to use strides and all kinds of array
+arithmetic without actually copying any data.</p></li>
+</ul>
+<p>This should always be your default
+way of passing arrays in and out of subroutines. However
+in the following cases one can (or has to) use <cite>explicit-shape</cite> arrays:</p>
+<ul class="simple">
+<li><p>returning an array from a function</p></li>
+<li><p>interfacing with C code or legacy Fortran (like Lapack)</p></li>
+<li><p>operating on arbitrary shape array with the given function (however there are
+also other ways to do that, see <a class="reference internal" href="#elemental"><span class="std std-ref">Element-wise Operations on Arrays Using Subroutines/Functions</span></a> for more information)</p></li>
+</ul>
+<p>To use <cite>explicit-shape</cite> arrays, do:</p>
+<div class="highlight-fortran notranslate"><div class="highlight"><pre><span></span><span class="k">subroutine </span><span class="n">f</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">r</span><span class="p">)</span>
+<span class="kt">integer</span><span class="p">,</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span> <span class="kd">::</span> <span class="n">n</span>
+<span class="kt">real</span><span class="p">(</span><span class="n">dp</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">out</span><span class="p">)</span> <span class="kd">::</span> <span class="n">r</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+<span class="kt">integer</span> <span class="kd">::</span> <span class="n">i</span>
+<span class="k">do </span><span class="n">i</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">n</span>
+    <span class="n">r</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">=</span> <span class="mf">1.0_dp</span> <span class="o">/</span> <span class="n">i</span><span class="o">**</span><span class="mi">2</span>
+<span class="n">enddo</span>
+<span class="k">end subroutine</span>
+</pre></div>
+</div>
+<p>2D arrays:</p>
+<div class="highlight-fortran notranslate"><div class="highlight"><pre><span></span><span class="k">subroutine </span><span class="n">g</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">A</span><span class="p">)</span>
+<span class="kt">integer</span><span class="p">,</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span> <span class="kd">::</span> <span class="n">m</span><span class="p">,</span> <span class="n">n</span>
+<span class="kt">real</span><span class="p">(</span><span class="n">dp</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span> <span class="kd">::</span> <span class="n">A</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span>
+<span class="p">...</span>
+<span class="k">end subroutine</span>
+</pre></div>
+</div>
+<p>and call it like this:</p>
+<div class="highlight-fortran notranslate"><div class="highlight"><pre><span></span><span class="kt">real</span><span class="p">(</span><span class="n">dp</span><span class="p">)</span> <span class="kd">::</span> <span class="n">r</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+<span class="k">call </span><span class="n">f</span><span class="p">(</span><span class="n">size</span><span class="p">(</span><span class="n">r</span><span class="p">),</span> <span class="n">r</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>In order to return an array from a function, do:</p>
+<div class="highlight-fortran notranslate"><div class="highlight"><pre><span></span><span class="k">function </span><span class="n">f</span><span class="p">(</span><span class="n">n</span><span class="p">)</span> <span class="k">result</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
+<span class="kt">integer</span><span class="p">,</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span> <span class="kd">::</span> <span class="n">n</span>
+<span class="kt">real</span><span class="p">(</span><span class="n">dp</span><span class="p">)</span> <span class="kd">::</span> <span class="n">r</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+<span class="kt">integer</span> <span class="kd">::</span> <span class="n">i</span>
+<span class="k">do </span><span class="n">i</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">n</span>
+    <span class="n">r</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">=</span> <span class="mf">1.0_dp</span> <span class="o">/</span> <span class="n">i</span><span class="o">**</span><span class="mi">2</span>
+<span class="n">enddo</span>
+<span class="k">end function</span>
+</pre></div>
+</div>
+<p>If you want to enforce/check the size of the arrays, put at the beginning of
+the function:</p>
+<div class="highlight-fortran notranslate"><div class="highlight"><pre><span></span><span class="k">if</span> <span class="p">(</span><span class="n">size</span><span class="p">(</span><span class="n">r</span><span class="p">)</span> <span class="o">/=</span> <span class="mi">4</span><span class="p">)</span> <span class="k">stop</span> <span class="s2">&quot;Incorrect size of &#39;r&#39;&quot;</span>
+</pre></div>
+</div>
+<p>To initialize an array, do:</p>
+<div class="highlight-fortran notranslate"><div class="highlight"><pre><span></span><span class="kt">integer</span> <span class="kd">::</span> <span class="n">r</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+<span class="n">r</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>This syntax is valid since the Fortran 2003 standard and it is the preferred
+syntax (the old syntax <code class="docutils literal notranslate"><span class="pre">r</span> <span class="pre">=</span> <span class="pre">(/</span> <span class="pre">1,</span> <span class="pre">2,</span> <span class="pre">3,</span> <span class="pre">4,</span> <span class="pre">5</span> <span class="pre">/)</span></code> should only be used if you
+cannot use Fortran 2003).</p>
+<p>In order for the array to start with different index than 1, do:</p>
+<div class="highlight-fortran notranslate"><div class="highlight"><pre><span></span><span class="k">subroutine </span><span class="n">print_eigenvalues</span><span class="p">(</span><span class="n">kappa_min</span><span class="p">,</span> <span class="n">lam</span><span class="p">)</span>
+<span class="kt">integer</span><span class="p">,</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span> <span class="kd">::</span> <span class="n">kappa_min</span>
+<span class="kt">real</span><span class="p">(</span><span class="n">dp</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span> <span class="kd">::</span> <span class="n">lam</span><span class="p">(</span><span class="n">kappa_min</span><span class="p">:)</span>
+
+<span class="kt">integer</span> <span class="kd">::</span> <span class="n">kappa</span>
+<span class="k">do </span><span class="n">kappa</span> <span class="o">=</span> <span class="n">kappa_min</span><span class="p">,</span> <span class="nb">ubound</span><span class="p">(</span><span class="n">lam</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="k">print</span> <span class="o">*</span><span class="p">,</span> <span class="n">kappa</span><span class="p">,</span> <span class="n">lam</span><span class="p">(</span><span class="n">kappa</span><span class="p">)</span>
+<span class="k">end do</span>
+<span class="k">end subroutine</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="multidimensional-arrays">
+<h2>Multidimensional Arrays<a class="headerlink" href="#multidimensional-arrays" title="Permalink to this headline">¶</a></h2>
+<p>Always access slices as <code class="docutils literal notranslate"><span class="pre">V(:,</span> <span class="pre">1)</span></code>, <code class="docutils literal notranslate"><span class="pre">V(:,</span> <span class="pre">2)</span></code>, or <code class="docutils literal notranslate"><span class="pre">V(:,</span> <span class="pre">:,</span> <span class="pre">1)</span></code>, e.g. the colons should be on the left. That way the stride is contiguous and it will be fast. So when you need some slice in your algorithm, always setup the array in a way, so that you call it as above. If you put the colon on the right, it will be slow.</p>
+<p>Example:</p>
+<div class="highlight-fortran notranslate"><div class="highlight"><pre><span></span><span class="n">dydx</span> <span class="o">=</span> <span class="nb">matmul</span><span class="p">(</span><span class="n">C</span><span class="p">(:,</span> <span class="p">:,</span> <span class="n">i</span><span class="p">),</span> <span class="n">y</span><span class="p">)</span> <span class="c">! fast</span>
+<span class="n">dydx</span> <span class="o">=</span> <span class="nb">matmul</span><span class="p">(</span><span class="n">C</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:),</span> <span class="n">y</span><span class="p">)</span> <span class="c">! slow</span>
+</pre></div>
+</div>
+<p>In other words, the “fortran storage order” is: smallest/fastest changing/innermost-loop index first, largest/slowest/outermost-loop index last (“Inner-most are left-most.”). So the elements of a 3D array <code class="docutils literal notranslate"><span class="pre">A(N1,N2,N3)</span></code> are stored, and thus most efficiently accessed, as:</p>
+<div class="highlight-fortran notranslate"><div class="highlight"><pre><span></span><span class="k">do </span><span class="n">i3</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">N3</span>
+    <span class="k">do </span><span class="n">i2</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">N2</span>
+        <span class="k">do </span><span class="n">i1</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">N1</span>
+            <span class="n">A</span><span class="p">(</span><span class="n">i1</span><span class="p">,</span> <span class="n">i2</span><span class="p">,</span> <span class="n">i3</span><span class="p">)</span>
+        <span class="k">end do</span>
+<span class="k">    end do</span>
+<span class="k">end do</span>
+</pre></div>
+</div>
+<p>Associated array of vectors would then be most efficiently accessed as:</p>
+<div class="highlight-fortran notranslate"><div class="highlight"><pre><span></span><span class="k">do </span><span class="n">i3</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">N3</span>
+    <span class="k">do </span><span class="n">i2</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">N2</span>
+        <span class="n">A</span><span class="p">(:,</span> <span class="n">i2</span><span class="p">,</span> <span class="n">i3</span><span class="p">)</span>
+    <span class="k">end do</span>
+<span class="k">end do</span>
+</pre></div>
+</div>
+<p>And associated set of matrices would be most efficiently accessed as:</p>
+<div class="highlight-fortran notranslate"><div class="highlight"><pre><span></span><span class="k">do </span><span class="n">i3</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">N3</span>
+    <span class="n">A</span><span class="p">(:,</span> <span class="p">:,</span> <span class="n">i3</span><span class="p">)</span>
+<span class="k">end do</span>
+</pre></div>
+</div>
+<p>Storing/accessing as above then accesses always contiguous blocks of memory, directly adjacent to one another; no skips/strides.</p>
+<p>When not sure, always rewrite (in your head) the algorithm to use strides, for example the first loop would become:</p>
+<div class="highlight-fortran notranslate"><div class="highlight"><pre><span></span><span class="k">do </span><span class="n">i3</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">N3</span>
+    <span class="n">Ai3</span> <span class="o">=</span> <span class="n">A</span><span class="p">(:,</span> <span class="p">:,</span> <span class="n">i3</span><span class="p">)</span>
+    <span class="k">do </span><span class="n">i2</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">N2</span>
+        <span class="n">Ai2i3</span> <span class="o">=</span> <span class="n">Ai3</span><span class="p">(:,</span> <span class="n">i2</span><span class="p">)</span>
+        <span class="k">do </span><span class="n">i1</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">N1</span>
+            <span class="n">Ai2i3</span><span class="p">(</span><span class="n">i1</span><span class="p">)</span>
+        <span class="k">end do</span>
+<span class="k">    end do</span>
+<span class="k">end do</span>
+</pre></div>
+</div>
+<p>the second loop would become:</p>
+<div class="highlight-fortran notranslate"><div class="highlight"><pre><span></span><span class="k">do </span><span class="n">i3</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">N3</span>
+    <span class="n">Ai3</span> <span class="o">=</span> <span class="n">A</span><span class="p">(:,</span> <span class="p">:,</span> <span class="n">i3</span><span class="p">)</span>
+    <span class="k">do </span><span class="n">i2</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">N2</span>
+        <span class="n">Ai3</span><span class="p">(:,</span> <span class="n">i2</span><span class="p">)</span>
+    <span class="k">end do</span>
+<span class="k">end do</span>
+</pre></div>
+</div>
+<p>And then make sure that all the strides are always on the left. Then it will be fast.</p>
+</div>
+<div class="section" id="element-wise-operations-on-arrays-using-subroutines-functions">
+<span id="elemental"></span><h2>Element-wise Operations on Arrays Using Subroutines/Functions<a class="headerlink" href="#element-wise-operations-on-arrays-using-subroutines-functions" title="Permalink to this headline">¶</a></h2>
+<p>There are three approaches:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">elemental</span></code> subroutines</p></li>
+<li><p><cite>explicit-shape</cite> arrays</p></li>
+<li><p>implementing the operation for vectors and write simple wrapper subroutines
+(that use <code class="docutils literal notranslate"><span class="pre">reshape</span></code> internally) for each array shape</p></li>
+</ul>
+<p>In the first approach,
+one uses the <code class="docutils literal notranslate"><span class="pre">elemental</span></code> keyword to create a function like this:</p>
+<div class="highlight-fortran notranslate"><div class="highlight"><pre><span></span><span class="kt">real</span><span class="p">(</span><span class="n">dp</span><span class="p">)</span> <span class="k">elemental function </span><span class="n">nroot</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="k">result</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+<span class="kt">integer</span><span class="p">,</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span> <span class="kd">::</span> <span class="n">n</span>
+<span class="kt">real</span><span class="p">(</span><span class="n">dp</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span> <span class="kd">::</span> <span class="n">x</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">x</span><span class="o">**</span><span class="p">(</span><span class="mf">1._dp</span> <span class="o">/</span> <span class="n">n</span><span class="p">)</span>
+<span class="k">end function</span>
+</pre></div>
+</div>
+<p>All arguments (in and out) must be scalars. You can then use
+this function with arrays of any (compatible) shape, for example:</p>
+<div class="highlight-fortran notranslate"><div class="highlight"><pre><span></span><span class="k">print</span> <span class="o">*</span><span class="p">,</span> <span class="n">nroot</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mf">9._dp</span><span class="p">)</span>
+<span class="k">print</span> <span class="o">*</span><span class="p">,</span> <span class="n">nroot</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="p">[</span><span class="mf">1._dp</span><span class="p">,</span> <span class="mf">4._dp</span><span class="p">,</span> <span class="mf">9._dp</span><span class="p">,</span> <span class="mi">1</span><span class="mf">0._dp</span><span class="p">])</span>
+<span class="k">print</span> <span class="o">*</span><span class="p">,</span> <span class="n">nroot</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="nb">reshape</span><span class="p">([</span><span class="mf">1._dp</span><span class="p">,</span> <span class="mf">4._dp</span><span class="p">,</span> <span class="mf">9._dp</span><span class="p">,</span> <span class="mi">1</span><span class="mf">0._dp</span><span class="p">],</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">]))</span>
+<span class="k">print</span> <span class="o">*</span><span class="p">,</span> <span class="n">nroot</span><span class="p">([</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">],</span> <span class="p">[</span><span class="mf">1._dp</span><span class="p">,</span> <span class="mf">4._dp</span><span class="p">,</span> <span class="mf">9._dp</span><span class="p">,</span> <span class="mi">1</span><span class="mf">0._dp</span><span class="p">])</span>
+<span class="k">print</span> <span class="o">*</span><span class="p">,</span> <span class="n">nroot</span><span class="p">([</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">],</span> <span class="mf">4._dp</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The output will be:</p>
+<div class="highlight-fortran notranslate"><div class="highlight"><pre><span></span><span class="mf">3.0000000000000000</span>
+<span class="mf">1.0000000000000000</span>        <span class="mf">2.0000000000000000</span>        <span class="mf">3.0000000000000000</span>        <span class="mf">3.1622776601683795</span>
+<span class="mf">1.0000000000000000</span>        <span class="mf">2.0000000000000000</span>        <span class="mf">3.0000000000000000</span>        <span class="mf">3.1622776601683795</span>
+<span class="mf">1.0000000000000000</span>        <span class="mf">1.5874010519681994</span>        <span class="mf">1.7320508075688772</span>        <span class="mf">1.5848931924611136</span>
+<span class="mf">2.0000000000000000</span>        <span class="mf">1.5874010519681994</span>        <span class="mf">1.4142135623730951</span>        <span class="mf">1.3195079107728942</span>
+</pre></div>
+</div>
+<p>In the above, typically <code class="docutils literal notranslate"><span class="pre">n</span></code> is a parameter and <code class="docutils literal notranslate"><span class="pre">x</span></code> is the array of an
+arbitrary shape, but as you can see, Fortran does not care as long as the final
+operation makes sense (if one argument is an array, then the other arguments
+must be either arrays of the same shape or scalars). If it does not, you will
+get a compiler error.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">elemental</span></code> keyword implies the <code class="docutils literal notranslate"><span class="pre">pure</span></code> keyword, so the subroutine must
+be pure (can only use <code class="docutils literal notranslate"><span class="pre">pure</span></code> subroutines and have no side effects).</p>
+<p>If the elemental function’s algorithm can be made faster using array operations
+inside, or if for some reason the arguments must be arrays of incompatible
+shapes,
+then one should use the other two approaches.
+One can make <code class="docutils literal notranslate"><span class="pre">nroot</span></code> operate
+on a vector and write a simple wrappers for other array shapes:</p>
+<div class="highlight-fortran notranslate"><div class="highlight"><pre><span></span><span class="k">function </span><span class="n">nroot</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="k">result</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+<span class="kt">integer</span><span class="p">,</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span> <span class="kd">::</span> <span class="n">n</span>
+<span class="kt">real</span><span class="p">(</span><span class="n">dp</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span> <span class="kd">::</span> <span class="n">x</span><span class="p">(:)</span>
+<span class="kt">real</span><span class="p">(</span><span class="n">dp</span><span class="p">)</span> <span class="kd">::</span> <span class="n">y</span><span class="p">(</span><span class="n">size</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">x</span><span class="o">**</span><span class="p">(</span><span class="mf">1._dp</span> <span class="o">/</span> <span class="n">n</span><span class="p">)</span>
+<span class="k">end function</span>
+
+<span class="k">function </span><span class="n">nroot_0d</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="k">result</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+<span class="kt">integer</span><span class="p">,</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span> <span class="kd">::</span> <span class="n">n</span>
+<span class="kt">real</span><span class="p">(</span><span class="n">dp</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span> <span class="kd">::</span> <span class="n">x</span>
+<span class="kt">real</span><span class="p">(</span><span class="n">dp</span><span class="p">)</span> <span class="kd">::</span> <span class="n">y</span>
+<span class="kt">real</span><span class="p">(</span><span class="n">dp</span><span class="p">)</span> <span class="kd">::</span> <span class="n">tmp</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">tmp</span> <span class="o">=</span> <span class="n">nroot</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="p">[</span><span class="n">x</span><span class="p">])</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">tmp</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="k">end function</span>
+
+<span class="k">function </span><span class="n">nroot_2d</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="k">result</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+<span class="kt">integer</span><span class="p">,</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span> <span class="kd">::</span> <span class="n">n</span>
+<span class="kt">real</span><span class="p">(</span><span class="n">dp</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span> <span class="kd">::</span> <span class="n">x</span><span class="p">(:,</span> <span class="p">:)</span>
+<span class="kt">real</span><span class="p">(</span><span class="n">dp</span><span class="p">)</span> <span class="kd">::</span> <span class="n">y</span><span class="p">(</span><span class="n">size</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">size</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+<span class="n">y</span> <span class="o">=</span> <span class="nb">reshape</span><span class="p">(</span><span class="n">nroot</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="nb">reshape</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="p">[</span><span class="n">size</span><span class="p">(</span><span class="n">x</span><span class="p">)])),</span> <span class="p">[</span><span class="n">size</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">size</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="mi">2</span><span class="p">)])</span>
+<span class="k">end function</span>
+</pre></div>
+</div>
+<p>And use as follows:</p>
+<div class="highlight-fortran notranslate"><div class="highlight"><pre><span></span><span class="k">print</span> <span class="o">*</span><span class="p">,</span> <span class="n">nroot_0d</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mf">9._dp</span><span class="p">)</span>
+<span class="k">print</span> <span class="o">*</span><span class="p">,</span> <span class="n">nroot</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="p">[</span><span class="mf">1._dp</span><span class="p">,</span> <span class="mf">4._dp</span><span class="p">,</span> <span class="mf">9._dp</span><span class="p">,</span> <span class="mi">1</span><span class="mf">0._dp</span><span class="p">])</span>
+<span class="k">print</span> <span class="o">*</span><span class="p">,</span> <span class="n">nroot_2d</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="nb">reshape</span><span class="p">([</span><span class="mf">1._dp</span><span class="p">,</span> <span class="mf">4._dp</span><span class="p">,</span> <span class="mf">9._dp</span><span class="p">,</span> <span class="mi">1</span><span class="mf">0._dp</span><span class="p">],</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">]))</span>
+</pre></div>
+</div>
+<p>This will print:</p>
+<div class="highlight-fortran notranslate"><div class="highlight"><pre><span></span><span class="mf">3.0000000000000000</span>
+<span class="mf">1.0000000000000000</span>        <span class="mf">2.0000000000000000</span>        <span class="mf">3.0000000000000000</span>        <span class="mf">3.1622776601683795</span>
+<span class="mf">1.0000000000000000</span>        <span class="mf">2.0000000000000000</span>        <span class="mf">3.0000000000000000</span>        <span class="mf">3.1622776601683795</span>
+</pre></div>
+</div>
+<p>Or one can use <cite>explicit-shape</cite> arrays as follows:</p>
+<div class="highlight-fortran notranslate"><div class="highlight"><pre><span></span><span class="k">function </span><span class="n">nroot</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="k">result</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+<span class="kt">integer</span><span class="p">,</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span> <span class="kd">::</span> <span class="n">n</span><span class="p">,</span> <span class="n">k</span>
+<span class="kt">real</span><span class="p">(</span><span class="n">dp</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span> <span class="kd">::</span> <span class="n">x</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+<span class="kt">real</span><span class="p">(</span><span class="n">dp</span><span class="p">)</span> <span class="kd">::</span> <span class="n">y</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">x</span><span class="o">**</span><span class="p">(</span><span class="mf">1._dp</span> <span class="o">/</span> <span class="n">n</span><span class="p">)</span>
+<span class="k">end function</span>
+</pre></div>
+</div>
+<p>Use as follows:</p>
+<div class="highlight-fortran notranslate"><div class="highlight"><pre><span></span><span class="k">print</span> <span class="o">*</span><span class="p">,</span> <span class="n">nroot</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="p">[</span><span class="mf">9._dp</span><span class="p">])</span>
+<span class="k">print</span> <span class="o">*</span><span class="p">,</span> <span class="n">nroot</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="p">[</span><span class="mf">1._dp</span><span class="p">,</span> <span class="mf">4._dp</span><span class="p">,</span> <span class="mf">9._dp</span><span class="p">,</span> <span class="mi">1</span><span class="mf">0._dp</span><span class="p">])</span>
+<span class="k">print</span> <span class="o">*</span><span class="p">,</span> <span class="n">nroot</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="nb">reshape</span><span class="p">([</span><span class="mf">1._dp</span><span class="p">,</span> <span class="mf">4._dp</span><span class="p">,</span> <span class="mf">9._dp</span><span class="p">,</span> <span class="mi">1</span><span class="mf">0._dp</span><span class="p">],</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">]))</span>
+</pre></div>
+</div>
+<p>The output is the same as before:</p>
+<div class="highlight-fortran notranslate"><div class="highlight"><pre><span></span><span class="mf">3.0000000000000000</span>
+<span class="mf">1.0000000000000000</span>        <span class="mf">2.0000000000000000</span>        <span class="mf">3.0000000000000000</span>        <span class="mf">3.1622776601683795</span>
+<span class="mf">1.0000000000000000</span>        <span class="mf">2.0000000000000000</span>        <span class="mf">3.0000000000000000</span>        <span class="mf">3.1622776601683795</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="allocatable-arrays">
+<h2>Allocatable Arrays<a class="headerlink" href="#allocatable-arrays" title="Permalink to this headline">¶</a></h2>
+<p>When using allocatable arrays (as opposed to pointers), Fortran manages the
+memory automatically and it is not possible to create memory leaks.</p>
+<p>For example you can allocate it inside a subroutine:</p>
+<div class="highlight-fortran notranslate"><div class="highlight"><pre><span></span><span class="k">subroutine </span><span class="n">foo</span><span class="p">(</span><span class="n">lam</span><span class="p">)</span>
+<span class="kt">real</span><span class="p">(</span><span class="n">dp</span><span class="p">),</span> <span class="k">allocatable</span><span class="p">,</span> <span class="k">intent</span><span class="p">(</span><span class="n">out</span><span class="p">)</span> <span class="kd">::</span> <span class="n">lam</span><span class="p">(:)</span>
+<span class="k">allocate</span><span class="p">(</span><span class="n">lam</span><span class="p">(</span><span class="mi">5</span><span class="p">))</span>
+<span class="k">end subroutine</span>
+</pre></div>
+</div>
+<p>And use somewhere else:</p>
+<div class="highlight-fortran notranslate"><div class="highlight"><pre><span></span><span class="kt">real</span><span class="p">(</span><span class="n">dp</span><span class="p">),</span> <span class="k">allocatable</span> <span class="kd">::</span> <span class="n">lam</span><span class="p">(:)</span>
+<span class="k">call </span><span class="n">foo</span><span class="p">(</span><span class="n">lam</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>When the <code class="docutils literal notranslate"><span class="pre">lam</span></code> symbol goes out of scope, Fortran will deallocate it. If
+<code class="docutils literal notranslate"><span class="pre">allocate</span></code> is called twice on the same array, Fortran will abort with a
+runtime error. One can check if <code class="docutils literal notranslate"><span class="pre">lam</span></code> is already allocated and deallocate it
+if needed (before another allocation):</p>
+<div class="highlight-fortran notranslate"><div class="highlight"><pre><span></span><span class="k">if</span> <span class="p">(</span><span class="nb">allocated</span><span class="p">(</span><span class="n">lam</span><span class="p">))</span> <span class="k">deallocate</span><span class="p">(</span><span class="n">lam</span><span class="p">)</span>
+<span class="k">allocate</span><span class="p">(</span><span class="n">lam</span><span class="p">(</span><span class="mi">10</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="file-input-output">
+<h2>File Input/Output<a class="headerlink" href="#file-input-output" title="Permalink to this headline">¶</a></h2>
+<p>To read from a file:</p>
+<div class="highlight-fortran notranslate"><div class="highlight"><pre><span></span><span class="kt">integer</span> <span class="kd">::</span> <span class="n">u</span>
+<span class="k">open</span><span class="p">(</span><span class="n">newunit</span><span class="o">=</span><span class="n">u</span><span class="p">,</span> <span class="k">file</span><span class="o">=</span><span class="s2">&quot;log.txt&quot;</span><span class="p">,</span> <span class="n">status</span><span class="o">=</span><span class="s2">&quot;old&quot;</span><span class="p">)</span>
+<span class="k">read</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="o">*</span><span class="p">)</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span>
+<span class="k">close</span><span class="p">(</span><span class="n">u</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Write to a file:</p>
+<div class="highlight-fortran notranslate"><div class="highlight"><pre><span></span><span class="kt">integer</span> <span class="kd">::</span> <span class="n">u</span>
+<span class="k">open</span><span class="p">(</span><span class="n">newunit</span><span class="o">=</span><span class="n">u</span><span class="p">,</span> <span class="k">file</span><span class="o">=</span><span class="s2">&quot;log.txt&quot;</span><span class="p">,</span> <span class="n">status</span><span class="o">=</span><span class="s2">&quot;replace&quot;</span><span class="p">)</span>
+<span class="k">write</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="o">*</span><span class="p">)</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span>
+<span class="k">close</span><span class="p">(</span><span class="n">u</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>To append to an existing file:</p>
+<div class="highlight-fortran notranslate"><div class="highlight"><pre><span></span><span class="kt">integer</span> <span class="kd">::</span> <span class="n">u</span>
+<span class="k">open</span><span class="p">(</span><span class="n">newunit</span><span class="o">=</span><span class="n">u</span><span class="p">,</span> <span class="k">file</span><span class="o">=</span><span class="s2">&quot;log.txt&quot;</span><span class="p">,</span> <span class="n">position</span><span class="o">=</span><span class="s2">&quot;append&quot;</span><span class="p">,</span> <span class="n">status</span><span class="o">=</span><span class="s2">&quot;old&quot;</span><span class="p">)</span>
+<span class="k">write</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="o">*</span><span class="p">)</span> <span class="n">N</span><span class="p">,</span> <span class="n">V</span><span class="p">(</span><span class="n">N</span><span class="p">)</span>
+<span class="k">close</span><span class="p">(</span><span class="n">u</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">newunit</span></code> keyword argument to <code class="docutils literal notranslate"><span class="pre">open</span></code> is a Fortran 2008 standard, in older compilers, just replace
+<code class="docutils literal notranslate"><span class="pre">open(newunit=u,</span> <span class="pre">...)</span></code> by:</p>
+<div class="highlight-fortran notranslate"><div class="highlight"><pre><span></span><span class="k">open</span><span class="p">(</span><span class="n">newunit</span><span class="p">(</span><span class="n">u</span><span class="p">),</span> <span class="p">...)</span>
+</pre></div>
+</div>
+<p>where the <code class="docutils literal notranslate"><span class="pre">newunit</span></code> function is defined by:</p>
+<div class="highlight-fortran notranslate"><div class="highlight"><pre><span></span><span class="kt">integer </span><span class="k">function </span><span class="n">newunit</span><span class="p">(</span><span class="n">unit</span><span class="p">)</span> <span class="k">result</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+<span class="c">! returns lowest i/o unit number not in use</span>
+<span class="kt">integer</span><span class="p">,</span> <span class="k">intent</span><span class="p">(</span><span class="n">out</span><span class="p">),</span> <span class="k">optional</span> <span class="kd">::</span> <span class="n">unit</span>
+<span class="kt">logical </span><span class="n">inuse</span>
+<span class="kt">integer</span><span class="p">,</span> <span class="k">parameter</span> <span class="kd">::</span> <span class="n">nmin</span><span class="o">=</span><span class="mi">10</span>   <span class="c">! avoid lower numbers which are sometimes reserved</span>
+<span class="kt">integer</span><span class="p">,</span> <span class="k">parameter</span> <span class="kd">::</span> <span class="n">nmax</span><span class="o">=</span><span class="mi">999</span>  <span class="c">! may be system-dependent</span>
+<span class="k">do </span><span class="n">n</span> <span class="o">=</span> <span class="n">nmin</span><span class="p">,</span> <span class="n">nmax</span>
+    <span class="k">inquire</span><span class="p">(</span><span class="n">unit</span><span class="o">=</span><span class="n">n</span><span class="p">,</span> <span class="n">opened</span><span class="o">=</span><span class="n">inuse</span><span class="p">)</span>
+    <span class="k">if</span> <span class="p">(.</span><span class="nb">not</span><span class="p">.</span> <span class="n">inuse</span><span class="p">)</span> <span class="k">then</span>
+<span class="k">        if</span> <span class="p">(</span><span class="nb">present</span><span class="p">(</span><span class="n">unit</span><span class="p">))</span> <span class="n">unit</span><span class="o">=</span><span class="n">n</span>
+        <span class="k">return</span>
+<span class="k">    end if</span>
+<span class="k">end do</span>
+<span class="k">call </span><span class="n">stop_error</span><span class="p">(</span><span class="s2">&quot;newunit ERROR: available unit not found.&quot;</span><span class="p">)</span>
+<span class="k">end function</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="interfacing-with-c">
+<span id="c-interface"></span><h2>Interfacing with C<a class="headerlink" href="#interfacing-with-c" title="Permalink to this headline">¶</a></h2>
+<p>Write a C wrapper using the <code class="docutils literal notranslate"><span class="pre">iso_c_binding</span></code> module:</p>
+<div class="highlight-fortran notranslate"><div class="highlight"><pre><span></span><span class="k">module </span><span class="n">fmesh_wrapper</span>
+
+<span class="k">use </span><span class="nb">iso_c_binding</span><span class="p">,</span> <span class="n">only</span><span class="p">:</span> <span class="kt">c_double</span><span class="p">,</span> <span class="kt">c_int</span>
+<span class="k">use </span><span class="n">fmesh</span><span class="p">,</span> <span class="n">only</span><span class="p">:</span> <span class="n">mesh_exp</span>
+
+<span class="k">implicit none</span>
+
+<span class="k">contains</span>
+
+<span class="k">subroutine </span><span class="n">c_mesh_exp</span><span class="p">(</span><span class="n">r_min</span><span class="p">,</span> <span class="n">r_max</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span> <span class="n">mesh</span><span class="p">)</span> <span class="k">bind</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+<span class="kt">real</span><span class="p">(</span><span class="kt">c_double</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span> <span class="kd">::</span> <span class="n">r_min</span>
+<span class="kt">real</span><span class="p">(</span><span class="kt">c_double</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span> <span class="kd">::</span> <span class="n">r_max</span>
+<span class="kt">real</span><span class="p">(</span><span class="kt">c_double</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span> <span class="kd">::</span> <span class="n">a</span>
+<span class="kt">integer</span><span class="p">(</span><span class="kt">c_int</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span> <span class="kd">::</span> <span class="n">N</span>
+<span class="kt">real</span><span class="p">(</span><span class="kt">c_double</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">out</span><span class="p">)</span> <span class="kd">::</span> <span class="n">mesh</span><span class="p">(</span><span class="n">N</span><span class="p">)</span>
+<span class="k">call </span><span class="n">mesh_exp</span><span class="p">(</span><span class="n">r_min</span><span class="p">,</span> <span class="n">r_max</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span> <span class="n">mesh</span><span class="p">)</span>
+<span class="k">end subroutine</span>
+
+<span class="c">! wrap more functions here</span>
+<span class="c">! ...</span>
+
+<span class="k">end module</span>
+</pre></div>
+</div>
+<p>You need to declare the length of all arrays (<code class="docutils literal notranslate"><span class="pre">mesh(N)</span></code>) and pass it as a
+parameter. The Fortran compiler will check that the C and Fortran types match.
+If it compiles, you can then trust it, and call it from C using the following
+declaration:</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="kt">void</span> <span class="nf">c_mesh_exp</span><span class="p">(</span><span class="kt">double</span> <span class="o">*</span><span class="n">r_min</span><span class="p">,</span> <span class="kt">double</span> <span class="o">*</span><span class="n">r_max</span><span class="p">,</span> <span class="kt">double</span> <span class="o">*</span><span class="n">a</span><span class="p">,</span> <span class="kt">int</span> <span class="o">*</span><span class="n">N</span><span class="p">,</span>
+        <span class="kt">double</span> <span class="o">*</span><span class="n">mesh</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>use it as:</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="kt">int</span> <span class="n">N</span><span class="o">=</span><span class="mi">5</span><span class="p">;</span>
+<span class="kt">double</span> <span class="n">r_min</span><span class="p">,</span> <span class="n">r_max</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">mesh</span><span class="p">[</span><span class="n">N</span><span class="p">];</span>
+<span class="n">c_mesh_exp</span><span class="p">(</span><span class="o">&amp;</span><span class="n">r_min</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">r_max</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">a</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">N</span><span class="p">,</span> <span class="n">mesh</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>No matter if you are passing arrays in or out, always allocate them in C first, and you are (in C) responsible for the memory management. Use Fortran to fill (or use) your arrays (that you own in C).</p>
+<p>If calling the Fortran <code class="docutils literal notranslate"><span class="pre">exp_mesh</span></code> subroutine from the <code class="docutils literal notranslate"><span class="pre">c_exp_mesh</span></code> subroutine is a problem (CPU efficiency), you can simply implement whatever the routine does directly in the <code class="docutils literal notranslate"><span class="pre">c_exp_mesh</span></code> subroutine. In other words, use the <code class="docutils literal notranslate"><span class="pre">iso_c_binding</span></code> module as a direct way to call Fortran code from C, and you can make it as fast as needed.</p>
+</div>
+<div class="section" id="interfacing-with-python">
+<span id="python-interface"></span><h2>Interfacing with Python<a class="headerlink" href="#interfacing-with-python" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="using-cython">
+<h3>Using Cython<a class="headerlink" href="#using-cython" title="Permalink to this headline">¶</a></h3>
+<p>To wrap Fortran code in Python, export it to C first (see above) and then write
+this Cython code:</p>
+<div class="highlight-cython notranslate"><div class="highlight"><pre><span></span><span class="k">from</span> <span class="nn">numpy</span> <span class="k">cimport</span> <span class="n">ndarray</span>
+<span class="k">from</span> <span class="nn">numpy</span> <span class="k">import</span> <span class="n">empty</span>
+
+<span class="k">cdef</span> <span class="kr">extern</span><span class="p">:</span>
+    <span class="n">void</span> <span class="n">c_mesh_exp</span><span class="p">(</span><span class="n">double</span> <span class="o">*</span><span class="n">r_min</span><span class="p">,</span> <span class="n">double</span> <span class="o">*</span><span class="n">r_max</span><span class="p">,</span> <span class="n">double</span> <span class="o">*</span><span class="n">a</span><span class="p">,</span> <span class="nb">int</span> <span class="o">*</span><span class="n">N</span><span class="p">,</span>
+            <span class="n">double</span> <span class="o">*</span><span class="n">mesh</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">mesh_exp</span><span class="p">(</span><span class="n">double</span> <span class="n">r_min</span><span class="p">,</span> <span class="n">double</span> <span class="n">r_max</span><span class="p">,</span> <span class="n">double</span> <span class="n">a</span><span class="p">,</span> <span class="nb">int</span> <span class="n">N</span><span class="p">):</span>
+    <span class="k">cdef</span> <span class="kt">ndarray</span>[<span class="nf">double</span><span class="p">,</span> <span class="nf">mode</span><span class="o">=</span><span class="s">&quot;c&quot;</span><span class="p">]</span> <span class="n">mesh</span> <span class="o">=</span> <span class="n">empty</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">double</span><span class="p">)</span>
+    <span class="n">c_mesh_exp</span><span class="p">(</span><span class="o">&amp;</span><span class="n">r_min</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">r_max</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">a</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">N</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">mesh</span><span class="p">[</span><span class="mf">0</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">mesh</span>
+</pre></div>
+</div>
+<p>The memory is allocated and owned (reference counted) by Python, and a pointer is given to the Fortran code. Use this approach for both “in” and “out” arrays.</p>
+<p>Notice that we didn’t write any C code — we only told fortran to use the C
+calling convention when producing the “.o” files, and then we pretended in
+Cython, that the function is implemented in C, but in fact, it is linked in
+from Fortran directly. So this is the most direct way of calling Fortran from
+Python. There is no intermediate step, and no unnecessary processing/wrapping
+involved.</p>
+</div>
+<div class="section" id="using-ctypes">
+<h3>Using ctypes<a class="headerlink" href="#using-ctypes" title="Permalink to this headline">¶</a></h3>
+<p>Alternatively, you can assign C-callable names to your Fortran
+routines like this:</p>
+<div class="highlight-fortran notranslate"><div class="highlight"><pre><span></span><span class="k">subroutine </span><span class="n">mesh_exp</span><span class="p">(</span><span class="n">r_min</span><span class="p">,</span> <span class="n">r_max</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span> <span class="n">mesh</span><span class="p">)</span> <span class="k">bind</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;mesh_exp&#39;</span><span class="p">)</span>
+  <span class="kt">real</span><span class="p">(</span><span class="kt">c_double</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">),</span> <span class="k">value</span> <span class="kd">::</span> <span class="n">r_min</span>
+  <span class="kt">real</span><span class="p">(</span><span class="kt">c_double</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">),</span> <span class="k">value</span> <span class="kd">::</span> <span class="n">r_max</span>
+  <span class="kt">real</span><span class="p">(</span><span class="kt">c_double</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">),</span> <span class="k">value</span> <span class="kd">::</span> <span class="n">a</span>
+  <span class="kt">integer</span><span class="p">(</span><span class="kt">c_int</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">),</span> <span class="k">value</span> <span class="kd">::</span> <span class="n">N</span>
+  <span class="kt">real</span><span class="p">(</span><span class="kt">c_double</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">out</span><span class="p">)</span> <span class="kd">::</span> <span class="n">mesh</span><span class="p">(</span><span class="n">N</span><span class="p">)</span>
+
+  <span class="c">! ...</span>
+
+<span class="k">end subroutine </span><span class="n">mesh_exp</span>
+</pre></div>
+</div>
+<p>and use the builtin <a class="reference external" href="http://docs.python.org/library/ctypes.html">ctypes</a>
+Python package to dynamically load
+shared object files containing your C-callable Fortran routines and
+call them directly:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ctypes</span> <span class="kn">import</span> <span class="n">CDLL</span><span class="p">,</span> <span class="n">POINTER</span><span class="p">,</span> <span class="n">c_int</span><span class="p">,</span> <span class="n">c_double</span>
+<span class="kn">from</span> <span class="nn">numpy</span> <span class="kn">import</span> <span class="n">empty</span>
+
+<span class="n">fortran</span> <span class="o">=</span> <span class="n">CDLL</span><span class="p">(</span><span class="s1">&#39;./libmyfortranroutines.so&#39;</span><span class="p">)</span>
+
+<span class="n">mesh</span> <span class="o">=</span> <span class="n">empty</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;double&quot;</span><span class="p">)</span>
+<span class="n">fortran</span><span class="o">.</span><span class="n">mesh_exp</span><span class="p">(</span><span class="n">c_double</span><span class="p">(</span><span class="n">r_min</span><span class="p">),</span> <span class="n">c_double</span><span class="p">(</span><span class="n">r_max</span><span class="p">),</span> <span class="n">c_double</span><span class="p">(</span><span class="n">a</span><span class="p">),</span> <span class="n">c_int</span><span class="p">(</span><span class="n">N</span><span class="p">),</span>
+                 <span class="n">mesh</span><span class="o">.</span><span class="n">ctypes</span><span class="o">.</span><span class="n">data_as</span><span class="p">(</span><span class="n">POINTER</span><span class="p">(</span><span class="n">c_double</span><span class="p">)))</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="callbacks">
+<h2>Callbacks<a class="headerlink" href="#callbacks" title="Permalink to this headline">¶</a></h2>
+<p>There are two ways to implement callbacks to be used like this:</p>
+<div class="highlight-fortran notranslate"><div class="highlight"><pre><span></span><span class="k">subroutine </span><span class="n">foo</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span>
+<span class="k">use </span><span class="n">integrals</span><span class="p">,</span> <span class="n">only</span><span class="p">:</span> <span class="n">simpson</span>
+<span class="kt">real</span><span class="p">(</span><span class="n">dp</span><span class="p">)</span> <span class="kd">::</span> <span class="n">a</span><span class="p">,</span> <span class="n">k</span>
+<span class="k">print</span> <span class="o">*</span><span class="p">,</span> <span class="n">simpson</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="mf">0._dp</span><span class="p">,</span> <span class="n">pi</span><span class="p">)</span>
+<span class="k">print</span> <span class="o">*</span><span class="p">,</span> <span class="n">simpson</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="mf">0._dp</span><span class="p">,</span> <span class="mi">2</span><span class="o">*</span><span class="n">pi</span><span class="p">)</span>
+
+<span class="k">contains</span>
+
+<span class="kt">real</span><span class="p">(</span><span class="n">dp</span><span class="p">)</span> <span class="k">function </span><span class="n">f</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">result</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+<span class="kt">real</span><span class="p">(</span><span class="n">dp</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span> <span class="kd">::</span> <span class="n">x</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">a</span><span class="o">*</span><span class="nb">sin</span><span class="p">(</span><span class="n">k</span><span class="o">*</span><span class="n">x</span><span class="p">)</span>
+<span class="k">end function </span><span class="n">f</span>
+
+<span class="k">end subroutine </span><span class="n">foo</span>
+</pre></div>
+</div>
+<p>The traditional approach is to simply declare the <code class="docutils literal notranslate"><span class="pre">f</span></code> dummy variable as a
+subroutine/function using:</p>
+<div class="highlight-fortran notranslate"><div class="highlight"><pre><span></span><span class="k">module </span><span class="n">integrals</span>
+<span class="k">use </span><span class="n">types</span><span class="p">,</span> <span class="n">only</span><span class="p">:</span> <span class="n">dp</span>
+<span class="k">implicit none</span>
+<span class="k">private</span>
+<span class="k">public </span><span class="n">simpson</span>
+
+<span class="k">contains</span>
+
+<span class="kt">real</span><span class="p">(</span><span class="n">dp</span><span class="p">)</span> <span class="k">function </span><span class="n">simpson</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span> <span class="k">result</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+<span class="kt">real</span><span class="p">(</span><span class="n">dp</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span> <span class="kd">::</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span>
+<span class="k">interface</span>
+<span class="k">    </span><span class="kt">real</span><span class="p">(</span><span class="n">dp</span><span class="p">)</span> <span class="k">function </span><span class="n">f</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+    <span class="k">use </span><span class="n">types</span><span class="p">,</span> <span class="n">only</span><span class="p">:</span> <span class="n">dp</span>
+    <span class="k">implicit none</span>
+<span class="k">    </span><span class="kt">real</span><span class="p">(</span><span class="n">dp</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span> <span class="kd">::</span> <span class="n">x</span>
+    <span class="k">end function</span>
+<span class="k">end interface</span>
+<span class="n">s</span> <span class="o">=</span> <span class="p">(</span><span class="n">b</span><span class="o">-</span><span class="n">a</span><span class="p">)</span> <span class="o">/</span> <span class="mi">6</span> <span class="o">*</span> <span class="p">(</span><span class="n">f</span><span class="p">(</span><span class="n">a</span><span class="p">)</span> <span class="o">+</span> <span class="mi">4</span><span class="o">*</span><span class="n">f</span><span class="p">((</span><span class="n">a</span><span class="o">+</span><span class="n">b</span><span class="p">)</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="n">f</span><span class="p">(</span><span class="n">b</span><span class="p">))</span>
+<span class="k">end function</span>
+
+<span class="k">end module</span>
+</pre></div>
+</div>
+<p>The other approach since f2003 is to first define a new type for our callback,
+and then use <code class="docutils literal notranslate"><span class="pre">procedure(func)</span></code> as the type of the dummy argument:</p>
+<div class="highlight-fortran notranslate"><div class="highlight"><pre><span></span><span class="k">module </span><span class="n">integrals</span>
+<span class="k">use </span><span class="n">types</span><span class="p">,</span> <span class="n">only</span><span class="p">:</span> <span class="n">dp</span>
+<span class="k">implicit none</span>
+<span class="k">private</span>
+<span class="k">public </span><span class="n">simpson</span>
+
+<span class="k">contains</span>
+
+<span class="kt">real</span><span class="p">(</span><span class="n">dp</span><span class="p">)</span> <span class="k">function </span><span class="n">simpson</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span> <span class="k">result</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+<span class="kt">real</span><span class="p">(</span><span class="n">dp</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span> <span class="kd">::</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span>
+<span class="k">interface</span>
+<span class="k">    </span><span class="kt">real</span><span class="p">(</span><span class="n">dp</span><span class="p">)</span> <span class="k">function </span><span class="n">func</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+    <span class="k">use </span><span class="n">types</span><span class="p">,</span> <span class="n">only</span><span class="p">:</span> <span class="n">dp</span>
+    <span class="k">implicit none</span>
+<span class="k">    </span><span class="kt">real</span><span class="p">(</span><span class="n">dp</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span> <span class="kd">::</span> <span class="n">x</span>
+    <span class="k">end function</span>
+<span class="k">end interface</span>
+<span class="k">procedure</span><span class="p">(</span><span class="n">func</span><span class="p">)</span> <span class="kd">::</span> <span class="n">f</span>
+<span class="n">s</span> <span class="o">=</span> <span class="p">(</span><span class="n">b</span><span class="o">-</span><span class="n">a</span><span class="p">)</span> <span class="o">/</span> <span class="mi">6</span> <span class="o">*</span> <span class="p">(</span><span class="n">f</span><span class="p">(</span><span class="n">a</span><span class="p">)</span> <span class="o">+</span> <span class="mi">4</span><span class="o">*</span><span class="n">f</span><span class="p">((</span><span class="n">a</span><span class="o">+</span><span class="n">b</span><span class="p">)</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="n">f</span><span class="p">(</span><span class="n">b</span><span class="p">))</span>
+<span class="k">end function</span>
+
+<span class="k">end module</span>
+</pre></div>
+</div>
+<p>The new type can also be defined outside of the function (and reused), like:</p>
+<div class="highlight-fortran notranslate"><div class="highlight"><pre><span></span><span class="k">module </span><span class="n">integrals</span>
+<span class="k">use </span><span class="n">types</span><span class="p">,</span> <span class="n">only</span><span class="p">:</span> <span class="n">dp</span>
+<span class="k">implicit none</span>
+<span class="k">private</span>
+<span class="k">public </span><span class="n">simpson</span>
+
+<span class="k">interface</span>
+<span class="k">    </span><span class="kt">real</span><span class="p">(</span><span class="n">dp</span><span class="p">)</span> <span class="k">function </span><span class="n">func</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+    <span class="k">use </span><span class="n">types</span><span class="p">,</span> <span class="n">only</span><span class="p">:</span> <span class="n">dp</span>
+    <span class="k">implicit none</span>
+<span class="k">    </span><span class="kt">real</span><span class="p">(</span><span class="n">dp</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span> <span class="kd">::</span> <span class="n">x</span>
+    <span class="k">end function</span>
+<span class="k">end interface</span>
+
+<span class="k">contains</span>
+
+<span class="kt">real</span><span class="p">(</span><span class="n">dp</span><span class="p">)</span> <span class="k">function </span><span class="n">simpson</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span> <span class="k">result</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+<span class="kt">real</span><span class="p">(</span><span class="n">dp</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span> <span class="kd">::</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span>
+<span class="k">procedure</span><span class="p">(</span><span class="n">func</span><span class="p">)</span> <span class="kd">::</span> <span class="n">f</span>
+<span class="n">s</span> <span class="o">=</span> <span class="p">(</span><span class="n">b</span><span class="o">-</span><span class="n">a</span><span class="p">)</span> <span class="o">/</span> <span class="mi">6</span> <span class="o">*</span> <span class="p">(</span><span class="n">f</span><span class="p">(</span><span class="n">a</span><span class="p">)</span> <span class="o">+</span> <span class="mi">4</span><span class="o">*</span><span class="n">f</span><span class="p">((</span><span class="n">a</span><span class="o">+</span><span class="n">b</span><span class="p">)</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="n">f</span><span class="p">(</span><span class="n">b</span><span class="p">))</span>
+<span class="k">end function</span>
+
+<span class="kt">real</span><span class="p">(</span><span class="n">dp</span><span class="p">)</span> <span class="k">function </span><span class="n">simpson2</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span> <span class="k">result</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+<span class="kt">real</span><span class="p">(</span><span class="n">dp</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span> <span class="kd">::</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span>
+<span class="k">procedure</span><span class="p">(</span><span class="n">func</span><span class="p">)</span> <span class="kd">::</span> <span class="n">f</span>
+<span class="kt">real</span><span class="p">(</span><span class="n">dp</span><span class="p">)</span> <span class="kd">::</span> <span class="n">mid</span>
+<span class="n">mid</span> <span class="o">=</span> <span class="p">(</span><span class="n">a</span> <span class="o">+</span> <span class="n">b</span><span class="p">)</span><span class="o">/</span><span class="mi">2</span>
+<span class="n">s</span> <span class="o">=</span> <span class="n">simpson</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">mid</span><span class="p">)</span> <span class="o">+</span> <span class="n">simpson</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">mid</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
+<span class="k">end function</span>
+
+<span class="k">end module</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="type-casting-in-callbacks">
+<span id="id2"></span><h2>Type Casting in Callbacks<a class="headerlink" href="#type-casting-in-callbacks" title="Permalink to this headline">¶</a></h2>
+<p>There are essentially five different ways to do that, each
+with its own advantages and disadvantages.</p>
+<p>The methods I, II and V can be used both in C and Fortran.
+The methods III and IV are only available in Fortran.
+The method VI is obsolete and should not be used.</p>
+<div class="section" id="i-work-arrays">
+<h3>I: Work Arrays<a class="headerlink" href="#i-work-arrays" title="Permalink to this headline">¶</a></h3>
+<p>Pass a “work array” or two which are packed with everything needed by the
+caller and unpacked by the called routine. This is the old way – e.g., how
+LAPACK does it.</p>
+<p>Integrator:</p>
+<div class="highlight-fortran notranslate"><div class="highlight"><pre><span></span><span class="k">module </span><span class="n">integrals</span>
+<span class="k">use </span><span class="n">types</span><span class="p">,</span> <span class="n">only</span><span class="p">:</span> <span class="n">dp</span>
+<span class="k">implicit none</span>
+<span class="k">private</span>
+<span class="k">public </span><span class="n">simpson</span>
+
+<span class="k">contains</span>
+
+<span class="kt">real</span><span class="p">(</span><span class="n">dp</span><span class="p">)</span> <span class="k">function </span><span class="n">simpson</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="k">data</span><span class="p">)</span> <span class="k">result</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+<span class="kt">real</span><span class="p">(</span><span class="n">dp</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span> <span class="kd">::</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span>
+<span class="k">interface</span>
+<span class="k">    </span><span class="kt">real</span><span class="p">(</span><span class="n">dp</span><span class="p">)</span> <span class="k">function </span><span class="n">func</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="k">data</span><span class="p">)</span>
+    <span class="k">use </span><span class="n">types</span><span class="p">,</span> <span class="n">only</span><span class="p">:</span> <span class="n">dp</span>
+    <span class="k">implicit none</span>
+<span class="k">    </span><span class="kt">real</span><span class="p">(</span><span class="n">dp</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span> <span class="kd">::</span> <span class="n">x</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">dp</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span> <span class="kd">::</span> <span class="k">data</span><span class="p">(:)</span>
+    <span class="k">end function</span>
+<span class="k">end interface</span>
+<span class="k">procedure</span><span class="p">(</span><span class="n">func</span><span class="p">)</span> <span class="kd">::</span> <span class="n">f</span>
+<span class="kt">real</span><span class="p">(</span><span class="n">dp</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span> <span class="kd">::</span> <span class="k">data</span><span class="p">(:)</span>
+<span class="n">s</span> <span class="o">=</span> <span class="p">(</span><span class="n">b</span><span class="o">-</span><span class="n">a</span><span class="p">)</span> <span class="o">/</span> <span class="mi">6</span> <span class="o">*</span> <span class="p">(</span><span class="n">f</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="k">data</span><span class="p">)</span> <span class="o">+</span> <span class="mi">4</span><span class="o">*</span><span class="n">f</span><span class="p">((</span><span class="n">a</span><span class="o">+</span><span class="n">b</span><span class="p">)</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span> <span class="k">data</span><span class="p">)</span> <span class="o">+</span> <span class="n">f</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="k">data</span><span class="p">))</span>
+<span class="k">end function</span>
+
+<span class="k">end module</span>
+</pre></div>
+</div>
+<p>Usage:</p>
+<div class="highlight-fortran notranslate"><div class="highlight"><pre><span></span><span class="k">module </span><span class="n">test</span>
+<span class="k">use </span><span class="n">types</span><span class="p">,</span> <span class="n">only</span><span class="p">:</span> <span class="n">dp</span>
+<span class="k">use </span><span class="n">integrals</span><span class="p">,</span> <span class="n">only</span><span class="p">:</span> <span class="n">simpson</span>
+<span class="k">implicit none</span>
+<span class="k">private</span>
+<span class="k">public </span><span class="n">foo</span>
+
+<span class="k">contains</span>
+
+<span class="kt">real</span><span class="p">(</span><span class="n">dp</span><span class="p">)</span> <span class="k">function </span><span class="n">f</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="k">data</span><span class="p">)</span> <span class="k">result</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+<span class="kt">real</span><span class="p">(</span><span class="n">dp</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span> <span class="kd">::</span> <span class="n">x</span>
+<span class="kt">real</span><span class="p">(</span><span class="n">dp</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span> <span class="kd">::</span> <span class="k">data</span><span class="p">(:)</span>
+<span class="kt">real</span><span class="p">(</span><span class="n">dp</span><span class="p">)</span> <span class="kd">::</span> <span class="n">a</span><span class="p">,</span> <span class="n">k</span>
+<span class="n">a</span> <span class="o">=</span> <span class="k">data</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">k</span> <span class="o">=</span> <span class="k">data</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">a</span><span class="o">*</span><span class="nb">sin</span><span class="p">(</span><span class="n">k</span><span class="o">*</span><span class="n">x</span><span class="p">)</span>
+<span class="k">end function</span>
+
+<span class="k">subroutine </span><span class="n">foo</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span>
+<span class="kt">real</span><span class="p">(</span><span class="n">dp</span><span class="p">)</span> <span class="kd">::</span> <span class="n">a</span><span class="p">,</span> <span class="n">k</span>
+<span class="kt">real</span><span class="p">(</span><span class="n">dp</span><span class="p">)</span> <span class="kd">::</span> <span class="k">data</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+<span class="k">data</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">=</span> <span class="n">a</span>
+<span class="k">data</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">=</span> <span class="n">k</span>
+<span class="k">print</span> <span class="o">*</span><span class="p">,</span> <span class="n">simpson</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="mf">0._dp</span><span class="p">,</span> <span class="n">pi</span><span class="p">,</span> <span class="k">data</span><span class="p">)</span>
+<span class="k">print</span> <span class="o">*</span><span class="p">,</span> <span class="n">simpson</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="mf">0._dp</span><span class="p">,</span> <span class="mi">2</span><span class="o">*</span><span class="n">pi</span><span class="p">,</span> <span class="k">data</span><span class="p">)</span>
+<span class="k">end subroutine</span>
+
+<span class="k">end module</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="ii-general-structure">
+<h3>II: General Structure<a class="headerlink" href="#ii-general-structure" title="Permalink to this headline">¶</a></h3>
+<p>Define general structure or two which encompass the variations you actually
+need (or are even remotely likely to need going forward). This single structure
+type or two can then change if needed as future needs/ideas permit but won’t
+likely need to change from passing, say, real numbers to, say, and
+instantiation of a text editor.</p>
+<p>Integrator:</p>
+<div class="highlight-fortran notranslate"><div class="highlight"><pre><span></span><span class="k">module </span><span class="n">integrals</span>
+<span class="k">use </span><span class="n">types</span><span class="p">,</span> <span class="n">only</span><span class="p">:</span> <span class="n">dp</span>
+<span class="k">implicit none</span>
+<span class="k">private</span>
+<span class="k">public </span><span class="n">simpson</span><span class="p">,</span> <span class="n">context</span>
+
+<span class="k">type </span><span class="n">context</span>
+    <span class="c">! This would be adjusted according to the problem to be solved.</span>
+    <span class="c">! For example:</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">dp</span><span class="p">)</span> <span class="kd">::</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">d</span>
+    <span class="kt">integer</span> <span class="kd">::</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">l</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">dp</span><span class="p">),</span> <span class="k">pointer</span> <span class="kd">::</span> <span class="n">x</span><span class="p">(:),</span> <span class="n">y</span><span class="p">(:)</span>
+    <span class="kt">integer</span><span class="p">,</span> <span class="k">pointer</span> <span class="kd">::</span> <span class="n">z</span><span class="p">(:)</span>
+<span class="k">end type</span>
+
+<span class="k">contains</span>
+
+<span class="kt">real</span><span class="p">(</span><span class="n">dp</span><span class="p">)</span> <span class="k">function </span><span class="n">simpson</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="k">data</span><span class="p">)</span> <span class="k">result</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+<span class="kt">real</span><span class="p">(</span><span class="n">dp</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span> <span class="kd">::</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span>
+<span class="k">interface</span>
+<span class="k">    </span><span class="kt">real</span><span class="p">(</span><span class="n">dp</span><span class="p">)</span> <span class="k">function </span><span class="n">func</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="k">data</span><span class="p">)</span>
+    <span class="k">use </span><span class="n">types</span><span class="p">,</span> <span class="n">only</span><span class="p">:</span> <span class="n">dp</span>
+    <span class="k">implicit none</span>
+<span class="k">    </span><span class="kt">real</span><span class="p">(</span><span class="n">dp</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span> <span class="kd">::</span> <span class="n">x</span>
+    <span class="k">type</span><span class="p">(</span><span class="n">context</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span> <span class="kd">::</span> <span class="k">data</span>
+<span class="k">    end function</span>
+<span class="k">end interface</span>
+<span class="k">procedure</span><span class="p">(</span><span class="n">func</span><span class="p">)</span> <span class="kd">::</span> <span class="n">f</span>
+<span class="k">type</span><span class="p">(</span><span class="n">context</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span> <span class="kd">::</span> <span class="k">data</span>
+<span class="n">s</span> <span class="o">=</span> <span class="p">(</span><span class="n">b</span><span class="o">-</span><span class="n">a</span><span class="p">)</span> <span class="o">/</span> <span class="mi">6</span> <span class="o">*</span> <span class="p">(</span><span class="n">f</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="k">data</span><span class="p">)</span> <span class="o">+</span> <span class="mi">4</span><span class="o">*</span><span class="n">f</span><span class="p">((</span><span class="n">a</span><span class="o">+</span><span class="n">b</span><span class="p">)</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span> <span class="k">data</span><span class="p">)</span> <span class="o">+</span> <span class="n">f</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="k">data</span><span class="p">))</span>
+<span class="k">end function</span>
+
+<span class="k">end module</span>
+</pre></div>
+</div>
+<p>Usage:</p>
+<div class="highlight-fortran notranslate"><div class="highlight"><pre><span></span><span class="k">module </span><span class="n">test</span>
+<span class="k">use </span><span class="n">types</span><span class="p">,</span> <span class="n">only</span><span class="p">:</span> <span class="n">dp</span>
+<span class="k">use </span><span class="n">integrals</span><span class="p">,</span> <span class="n">only</span><span class="p">:</span> <span class="n">simpson</span><span class="p">,</span> <span class="n">context</span>
+<span class="k">implicit none</span>
+<span class="k">private</span>
+<span class="k">public </span><span class="n">foo</span>
+
+<span class="k">contains</span>
+
+<span class="kt">real</span><span class="p">(</span><span class="n">dp</span><span class="p">)</span> <span class="k">function </span><span class="n">f</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="k">data</span><span class="p">)</span> <span class="k">result</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+<span class="kt">real</span><span class="p">(</span><span class="n">dp</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span> <span class="kd">::</span> <span class="n">x</span>
+<span class="k">type</span><span class="p">(</span><span class="n">context</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span> <span class="kd">::</span> <span class="k">data</span>
+<span class="kt">real</span><span class="p">(</span><span class="n">dp</span><span class="p">)</span> <span class="kd">::</span> <span class="n">a</span><span class="p">,</span> <span class="n">k</span>
+<span class="n">a</span> <span class="o">=</span> <span class="k">data</span><span class="p">%</span><span class="n">a</span>
+<span class="n">k</span> <span class="o">=</span> <span class="k">data</span><span class="p">%</span><span class="n">b</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">a</span><span class="o">*</span><span class="nb">sin</span><span class="p">(</span><span class="n">k</span><span class="o">*</span><span class="n">x</span><span class="p">)</span>
+<span class="k">end function</span>
+
+<span class="k">subroutine </span><span class="n">foo</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span>
+<span class="kt">real</span><span class="p">(</span><span class="n">dp</span><span class="p">)</span> <span class="kd">::</span> <span class="n">a</span><span class="p">,</span> <span class="n">k</span>
+<span class="k">type</span><span class="p">(</span><span class="n">context</span><span class="p">)</span> <span class="kd">::</span> <span class="k">data</span>
+<span class="k">data</span><span class="p">%</span><span class="n">a</span> <span class="o">=</span> <span class="n">a</span>
+<span class="k">data</span><span class="p">%</span><span class="n">b</span> <span class="o">=</span> <span class="n">k</span>
+<span class="k">print</span> <span class="o">*</span><span class="p">,</span> <span class="n">simpson</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="mf">0._dp</span><span class="p">,</span> <span class="n">pi</span><span class="p">,</span> <span class="k">data</span><span class="p">)</span>
+<span class="k">print</span> <span class="o">*</span><span class="p">,</span> <span class="n">simpson</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="mf">0._dp</span><span class="p">,</span> <span class="mi">2</span><span class="o">*</span><span class="n">pi</span><span class="p">,</span> <span class="k">data</span><span class="p">)</span>
+<span class="k">end subroutine</span>
+
+<span class="k">end module</span>
+</pre></div>
+</div>
+<p>There is only so much flexibility really
+needed. For example, you could define two structure types for this purpose, one
+for Schroedinger and one for Dirac. Each would then be sufficiently general and
+contain all the needed pieces with all the right labels.</p>
+<p>Point is: it needn’t
+be “one abstract type to encompass all” or bust. There are natural and viable
+options between “all” and “none”.</p>
+</div>
+<div class="section" id="iii-private-module-variables">
+<h3>III: Private Module Variables<a class="headerlink" href="#iii-private-module-variables" title="Permalink to this headline">¶</a></h3>
+<p>Hide the variable arguments completely by passing in module variables.</p>
+<p>Integrator:</p>
+<div class="highlight-fortran notranslate"><div class="highlight"><pre><span></span><span class="k">module </span><span class="n">integrals</span>
+<span class="k">use </span><span class="n">types</span><span class="p">,</span> <span class="n">only</span><span class="p">:</span> <span class="n">dp</span>
+<span class="k">implicit none</span>
+<span class="k">private</span>
+<span class="k">public </span><span class="n">simpson</span>
+
+<span class="k">contains</span>
+
+<span class="kt">real</span><span class="p">(</span><span class="n">dp</span><span class="p">)</span> <span class="k">function </span><span class="n">simpson</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span> <span class="k">result</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+<span class="kt">real</span><span class="p">(</span><span class="n">dp</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span> <span class="kd">::</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span>
+<span class="k">interface</span>
+<span class="k">    </span><span class="kt">real</span><span class="p">(</span><span class="n">dp</span><span class="p">)</span> <span class="k">function </span><span class="n">func</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+    <span class="k">use </span><span class="n">types</span><span class="p">,</span> <span class="n">only</span><span class="p">:</span> <span class="n">dp</span>
+    <span class="k">implicit none</span>
+<span class="k">    </span><span class="kt">real</span><span class="p">(</span><span class="n">dp</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span> <span class="kd">::</span> <span class="n">x</span>
+    <span class="k">end function</span>
+<span class="k">end interface</span>
+<span class="k">procedure</span><span class="p">(</span><span class="n">func</span><span class="p">)</span> <span class="kd">::</span> <span class="n">f</span>
+<span class="n">s</span> <span class="o">=</span> <span class="p">(</span><span class="n">b</span><span class="o">-</span><span class="n">a</span><span class="p">)</span> <span class="o">/</span> <span class="mi">6</span> <span class="o">*</span> <span class="p">(</span><span class="n">f</span><span class="p">(</span><span class="n">a</span><span class="p">)</span> <span class="o">+</span> <span class="mi">4</span><span class="o">*</span><span class="n">f</span><span class="p">((</span><span class="n">a</span><span class="o">+</span><span class="n">b</span><span class="p">)</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="n">f</span><span class="p">(</span><span class="n">b</span><span class="p">))</span>
+<span class="k">end function</span>
+
+<span class="k">end module</span>
+</pre></div>
+</div>
+<p>Usage:</p>
+<div class="highlight-fortran notranslate"><div class="highlight"><pre><span></span><span class="k">module </span><span class="n">test</span>
+<span class="k">use </span><span class="n">types</span><span class="p">,</span> <span class="n">only</span><span class="p">:</span> <span class="n">dp</span>
+<span class="k">use </span><span class="n">integrals</span><span class="p">,</span> <span class="n">only</span><span class="p">:</span> <span class="n">simpson</span>
+<span class="k">implicit none</span>
+<span class="k">private</span>
+<span class="k">public </span><span class="n">foo</span>
+
+<span class="kt">real</span><span class="p">(</span><span class="n">dp</span><span class="p">)</span> <span class="kd">::</span> <span class="n">global_a</span><span class="p">,</span> <span class="n">global_k</span>
+
+<span class="k">contains</span>
+
+<span class="kt">real</span><span class="p">(</span><span class="n">dp</span><span class="p">)</span> <span class="k">function </span><span class="n">f</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">result</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+<span class="kt">real</span><span class="p">(</span><span class="n">dp</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span> <span class="kd">::</span> <span class="n">x</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">global_a</span><span class="o">*</span><span class="nb">sin</span><span class="p">(</span><span class="n">global_k</span><span class="o">*</span><span class="n">x</span><span class="p">)</span>
+<span class="k">end function</span>
+
+<span class="k">subroutine </span><span class="n">foo</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span>
+<span class="kt">real</span><span class="p">(</span><span class="n">dp</span><span class="p">)</span> <span class="kd">::</span> <span class="n">a</span><span class="p">,</span> <span class="n">k</span>
+<span class="n">global_a</span> <span class="o">=</span> <span class="n">a</span>
+<span class="n">global_k</span> <span class="o">=</span> <span class="n">k</span>
+<span class="k">print</span> <span class="o">*</span><span class="p">,</span> <span class="n">simpson</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="mf">0._dp</span><span class="p">,</span> <span class="n">pi</span><span class="p">)</span>
+<span class="k">print</span> <span class="o">*</span><span class="p">,</span> <span class="n">simpson</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="mf">0._dp</span><span class="p">,</span> <span class="mi">2</span><span class="o">*</span><span class="n">pi</span><span class="p">)</span>
+<span class="k">end subroutine</span>
+
+<span class="k">end module</span>
+</pre></div>
+</div>
+<p>However it is best to avoid such global variables – even though really just
+semi-global – if possible. But sometimes it may be the simplest cleanest way.
+However, with a bit of thought, usually there is a better, safer, more explicit
+way along the lines of II or IV.</p>
+</div>
+<div class="section" id="iv-nested-functions">
+<h3>IV: Nested functions<a class="headerlink" href="#iv-nested-functions" title="Permalink to this headline">¶</a></h3>
+<p>Integrator:</p>
+<div class="highlight-fortran notranslate"><div class="highlight"><pre><span></span><span class="k">module </span><span class="n">integrals</span>
+<span class="k">use </span><span class="n">types</span><span class="p">,</span> <span class="n">only</span><span class="p">:</span> <span class="n">dp</span>
+<span class="k">implicit none</span>
+<span class="k">private</span>
+<span class="k">public </span><span class="n">simpson</span>
+
+<span class="k">contains</span>
+
+<span class="kt">real</span><span class="p">(</span><span class="n">dp</span><span class="p">)</span> <span class="k">function </span><span class="n">simpson</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span> <span class="k">result</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+<span class="kt">real</span><span class="p">(</span><span class="n">dp</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span> <span class="kd">::</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span>
+<span class="k">interface</span>
+<span class="k">    </span><span class="kt">real</span><span class="p">(</span><span class="n">dp</span><span class="p">)</span> <span class="k">function </span><span class="n">func</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+    <span class="k">use </span><span class="n">types</span><span class="p">,</span> <span class="n">only</span><span class="p">:</span> <span class="n">dp</span>
+    <span class="k">implicit none</span>
+<span class="k">    </span><span class="kt">real</span><span class="p">(</span><span class="n">dp</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span> <span class="kd">::</span> <span class="n">x</span>
+    <span class="k">end function</span>
+<span class="k">end interface</span>
+<span class="k">procedure</span><span class="p">(</span><span class="n">func</span><span class="p">)</span> <span class="kd">::</span> <span class="n">f</span>
+<span class="n">s</span> <span class="o">=</span> <span class="p">(</span><span class="n">b</span><span class="o">-</span><span class="n">a</span><span class="p">)</span> <span class="o">/</span> <span class="mi">6</span> <span class="o">*</span> <span class="p">(</span><span class="n">f</span><span class="p">(</span><span class="n">a</span><span class="p">)</span> <span class="o">+</span> <span class="mi">4</span><span class="o">*</span><span class="n">f</span><span class="p">((</span><span class="n">a</span><span class="o">+</span><span class="n">b</span><span class="p">)</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="n">f</span><span class="p">(</span><span class="n">b</span><span class="p">))</span>
+<span class="k">end function</span>
+
+<span class="k">end module</span>
+</pre></div>
+</div>
+<p>Usage:</p>
+<div class="highlight-fortran notranslate"><div class="highlight"><pre><span></span><span class="k">subroutine </span><span class="n">foo</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span>
+<span class="k">use </span><span class="n">integrals</span><span class="p">,</span> <span class="n">only</span><span class="p">:</span> <span class="n">simpson</span>
+<span class="kt">real</span><span class="p">(</span><span class="n">dp</span><span class="p">)</span> <span class="kd">::</span> <span class="n">a</span><span class="p">,</span> <span class="n">k</span>
+<span class="k">print</span> <span class="o">*</span><span class="p">,</span> <span class="n">simpson</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="mf">0._dp</span><span class="p">,</span> <span class="n">pi</span><span class="p">)</span>
+<span class="k">print</span> <span class="o">*</span><span class="p">,</span> <span class="n">simpson</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="mf">0._dp</span><span class="p">,</span> <span class="mi">2</span><span class="o">*</span><span class="n">pi</span><span class="p">)</span>
+
+<span class="k">contains</span>
+
+<span class="kt">real</span><span class="p">(</span><span class="n">dp</span><span class="p">)</span> <span class="k">function </span><span class="n">f</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">result</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+<span class="kt">real</span><span class="p">(</span><span class="n">dp</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span> <span class="kd">::</span> <span class="n">x</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">a</span><span class="o">*</span><span class="nb">sin</span><span class="p">(</span><span class="n">k</span><span class="o">*</span><span class="n">x</span><span class="p">)</span>
+<span class="k">end function </span><span class="n">f</span>
+
+<span class="k">end subroutine </span><span class="n">foo</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="v-using-type-c-ptr-pointer">
+<h3>V: Using type(c_ptr) Pointer<a class="headerlink" href="#v-using-type-c-ptr-pointer" title="Permalink to this headline">¶</a></h3>
+<p>In C, one would use the <code class="docutils literal notranslate"><span class="pre">void</span> <span class="pre">*</span></code> pointer. In Fortran, one
+can use <code class="docutils literal notranslate"><span class="pre">type(c_ptr)</span></code> for exactly the same purpose.</p>
+<p>Integrator:</p>
+<div class="highlight-fortran notranslate"><div class="highlight"><pre><span></span><span class="k">module </span><span class="n">integrals</span>
+<span class="k">use </span><span class="n">types</span><span class="p">,</span> <span class="n">only</span><span class="p">:</span> <span class="n">dp</span>
+<span class="k">use </span><span class="nb">iso_c_binding</span><span class="p">,</span> <span class="n">only</span><span class="p">:</span> <span class="kt">c_ptr</span>
+<span class="k">implicit none</span>
+<span class="k">private</span>
+<span class="k">public </span><span class="n">simpson</span>
+
+<span class="k">contains</span>
+
+<span class="kt">real</span><span class="p">(</span><span class="n">dp</span><span class="p">)</span> <span class="k">function </span><span class="n">simpson</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="k">data</span><span class="p">)</span> <span class="k">result</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+<span class="kt">real</span><span class="p">(</span><span class="n">dp</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span> <span class="kd">::</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span>
+<span class="k">interface</span>
+<span class="k">    </span><span class="kt">real</span><span class="p">(</span><span class="n">dp</span><span class="p">)</span> <span class="k">function </span><span class="n">func</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="k">data</span><span class="p">)</span>
+    <span class="k">use </span><span class="n">types</span><span class="p">,</span> <span class="n">only</span><span class="p">:</span> <span class="n">dp</span>
+    <span class="k">implicit none</span>
+<span class="k">    </span><span class="kt">real</span><span class="p">(</span><span class="n">dp</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span> <span class="kd">::</span> <span class="n">x</span>
+    <span class="k">type</span><span class="p">(</span><span class="kt">c_ptr</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span> <span class="kd">::</span> <span class="k">data</span>
+<span class="k">    end function</span>
+<span class="k">end interface</span>
+<span class="k">procedure</span><span class="p">(</span><span class="n">func</span><span class="p">)</span> <span class="kd">::</span> <span class="n">f</span>
+<span class="k">type</span><span class="p">(</span><span class="kt">c_ptr</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span> <span class="kd">::</span> <span class="k">data</span>
+<span class="n">s</span> <span class="o">=</span> <span class="p">(</span><span class="n">b</span><span class="o">-</span><span class="n">a</span><span class="p">)</span> <span class="o">/</span> <span class="mi">6</span> <span class="o">*</span> <span class="p">(</span><span class="n">f</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="k">data</span><span class="p">)</span> <span class="o">+</span> <span class="mi">4</span><span class="o">*</span><span class="n">f</span><span class="p">((</span><span class="n">a</span><span class="o">+</span><span class="n">b</span><span class="p">)</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span> <span class="k">data</span><span class="p">)</span> <span class="o">+</span> <span class="n">f</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="k">data</span><span class="p">))</span>
+<span class="k">end function</span>
+
+<span class="k">end module</span>
+</pre></div>
+</div>
+<p>Usage:</p>
+<div class="highlight-fortran notranslate"><div class="highlight"><pre><span></span><span class="k">module </span><span class="n">test</span>
+<span class="k">use </span><span class="n">types</span><span class="p">,</span> <span class="n">only</span><span class="p">:</span> <span class="n">dp</span>
+<span class="k">use </span><span class="n">integrals</span><span class="p">,</span> <span class="n">only</span><span class="p">:</span> <span class="n">simpson</span>
+<span class="k">use </span><span class="nb">iso_c_binding</span><span class="p">,</span> <span class="n">only</span><span class="p">:</span> <span class="kt">c_ptr</span><span class="p">,</span> <span class="nb">c_loc</span><span class="p">,</span> <span class="nb">c_f_pointer</span>
+<span class="k">implicit none</span>
+<span class="k">private</span>
+<span class="k">public </span><span class="n">foo</span>
+
+<span class="k">type </span><span class="n">f_data</span>
+    <span class="c">! Only contains data that we need for our particular callback.</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">dp</span><span class="p">)</span> <span class="kd">::</span> <span class="n">a</span><span class="p">,</span> <span class="n">k</span>
+<span class="k">end type</span>
+
+<span class="k">contains</span>
+
+<span class="kt">real</span><span class="p">(</span><span class="n">dp</span><span class="p">)</span> <span class="k">function </span><span class="n">f</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="k">data</span><span class="p">)</span> <span class="k">result</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+<span class="kt">real</span><span class="p">(</span><span class="n">dp</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span> <span class="kd">::</span> <span class="n">x</span>
+<span class="k">type</span><span class="p">(</span><span class="kt">c_ptr</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span> <span class="kd">::</span> <span class="k">data</span>
+<span class="k">type</span><span class="p">(</span><span class="n">f_data</span><span class="p">),</span> <span class="k">pointer</span> <span class="kd">::</span> <span class="n">d</span>
+<span class="k">call </span><span class="nb">c_f_pointer</span><span class="p">(</span><span class="k">data</span><span class="p">,</span> <span class="n">d</span><span class="p">)</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">d</span><span class="p">%</span><span class="n">a</span> <span class="o">*</span> <span class="nb">sin</span><span class="p">(</span><span class="n">d</span><span class="p">%</span><span class="n">k</span> <span class="o">*</span> <span class="n">x</span><span class="p">)</span>
+<span class="k">end function</span>
+
+<span class="k">subroutine </span><span class="n">foo</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span>
+<span class="kt">real</span><span class="p">(</span><span class="n">dp</span><span class="p">)</span> <span class="kd">::</span> <span class="n">a</span><span class="p">,</span> <span class="n">k</span>
+<span class="k">type</span><span class="p">(</span><span class="n">f_data</span><span class="p">),</span> <span class="k">target</span> <span class="kd">::</span> <span class="k">data</span>
+<span class="k">data</span><span class="p">%</span><span class="n">a</span> <span class="o">=</span> <span class="n">a</span>
+<span class="k">data</span><span class="p">%</span><span class="n">k</span> <span class="o">=</span> <span class="n">k</span>
+<span class="k">print</span> <span class="o">*</span><span class="p">,</span> <span class="n">simpson</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="mf">0._dp</span><span class="p">,</span> <span class="n">pi</span><span class="p">,</span> <span class="nb">c_loc</span><span class="p">(</span><span class="k">data</span><span class="p">))</span>
+<span class="k">print</span> <span class="o">*</span><span class="p">,</span> <span class="n">simpson</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="mf">0._dp</span><span class="p">,</span> <span class="mi">2</span><span class="o">*</span><span class="n">pi</span><span class="p">,</span> <span class="nb">c_loc</span><span class="p">(</span><span class="k">data</span><span class="p">))</span>
+<span class="k">end subroutine</span>
+
+<span class="k">end module</span>
+</pre></div>
+</div>
+<p>As always, with the advantages of such re-casting, as Fortran lets you
+do if you really want to, come also the disadvantages that fewer compile- and
+run-time checks are possible to catch errors; and with that, inevitably more
+leaky, bug-prone code. So one always has to balance the costs and benefits.</p>
+<p>Usually, in the context of scientific programming, where the main thrust
+is to represent and solve precise mathematical formulations (as opposed to
+create a GUI with some untold number of buttons, drop-downs, and other
+interface elements), simplest, least bug-prone, and fastest is to use one of
+the previous approaches.</p>
+</div>
+<div class="section" id="vi-transfer-intrinsic-function">
+<h3>VI: transfer() Intrinsic Function<a class="headerlink" href="#vi-transfer-intrinsic-function" title="Permalink to this headline">¶</a></h3>
+<p>Before Fortran 2003, the only way to do type casting
+was using the <code class="docutils literal notranslate"><span class="pre">transfer</span></code> intrinsic function. It is functionally equivalent to
+the method V, but more verbose and more error prone.
+It is now obsolete and one should use the method V instead.</p>
+<p>Examples:</p>
+<p><a class="reference external" href="http://jblevins.org/log/transfer">http://jblevins.org/log/transfer</a></p>
+<p><a class="reference external" href="http://jblevins.org/research/generic-list.pdf">http://jblevins.org/research/generic-list.pdf</a></p>
+<p><a class="reference external" href="http://www.macresearch.org/advanced_fortran_90_callbacks_with_the_transfer_function">http://www.macresearch.org/advanced_fortran_90_callbacks_with_the_transfer_function</a></p>
+</div>
+<div class="section" id="vii-object-oriented-approach">
+<h3>VII: Object Oriented Approach<a class="headerlink" href="#vii-object-oriented-approach" title="Permalink to this headline">¶</a></h3>
+<p>The module:</p>
+<div class="highlight-fortran notranslate"><div class="highlight"><pre><span></span><span class="k">module </span><span class="n">integrals</span>
+
+<span class="k">use </span><span class="n">types</span><span class="p">,</span> <span class="n">only</span><span class="p">:</span> <span class="n">dp</span>
+<span class="k">implicit none</span>
+<span class="k">private</span>
+
+<span class="k">public</span> <span class="kd">::</span> <span class="n">integrand</span><span class="p">,</span> <span class="n">simpson</span>
+
+<span class="c">! User extends this type</span>
+<span class="k">type</span><span class="p">,</span> <span class="k">abstract</span> <span class="kd">::</span> <span class="n">integrand</span>
+<span class="k">contains</span>
+<span class="k">    procedure</span><span class="p">(</span><span class="n">func</span><span class="p">),</span> <span class="k">deferred</span> <span class="kd">::</span> <span class="n">eval</span>
+<span class="k">end type</span>
+
+<span class="k">abstract interface</span>
+<span class="k">    function </span><span class="n">func</span><span class="p">(</span><span class="n">this</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="k">result</span><span class="p">(</span><span class="n">fx</span><span class="p">)</span>
+    <span class="k">import</span> <span class="kd">::</span> <span class="n">integrand</span><span class="p">,</span> <span class="n">dp</span>
+    <span class="k">class</span><span class="p">(</span><span class="n">integrand</span><span class="p">)</span> <span class="kd">::</span> <span class="n">this</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">dp</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span> <span class="kd">::</span> <span class="n">x</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">dp</span><span class="p">)</span> <span class="kd">::</span> <span class="n">fx</span>
+    <span class="k">end function</span>
+<span class="k">end interface</span>
+
+<span class="k">contains</span>
+
+<span class="kt">real</span><span class="p">(</span><span class="n">dp</span><span class="p">)</span> <span class="k">function </span><span class="n">simpson</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span> <span class="k">result</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+<span class="k">class</span><span class="p">(</span><span class="n">integrand</span><span class="p">)</span> <span class="kd">::</span> <span class="n">f</span>
+<span class="kt">real</span><span class="p">(</span><span class="n">dp</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span> <span class="kd">::</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span>
+<span class="n">s</span> <span class="o">=</span> <span class="p">((</span><span class="n">b</span><span class="o">-</span><span class="n">a</span><span class="p">)</span><span class="o">/</span><span class="mi">6</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">f</span><span class="p">%</span><span class="n">eval</span><span class="p">(</span><span class="n">a</span><span class="p">)</span> <span class="o">+</span> <span class="mi">4</span><span class="o">*</span><span class="n">f</span><span class="p">%</span><span class="n">eval</span><span class="p">((</span><span class="n">a</span><span class="o">+</span><span class="n">b</span><span class="p">)</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="n">f</span><span class="p">%</span><span class="n">eval</span><span class="p">(</span><span class="n">b</span><span class="p">))</span>
+<span class="k">end function</span>
+
+<span class="k">end module</span>
+</pre></div>
+</div>
+<p>The abstract type prescribes exactly what the integration routine
+needs, namely a method to evaluate the function, but imposes nothing
+else on the user.  The user extends this type, providing a concrete
+implementation of the eval type bound procedure and adding necessary
+context data as components of the extended type.</p>
+<p>Usage:</p>
+<div class="highlight-fortran notranslate"><div class="highlight"><pre><span></span><span class="k">module </span><span class="n">example_usage</span>
+
+<span class="k">use </span><span class="n">types</span><span class="p">,</span> <span class="n">only</span><span class="p">:</span> <span class="n">dp</span>
+<span class="k">use </span><span class="n">integrals</span><span class="p">,</span> <span class="n">only</span><span class="p">:</span> <span class="n">integrand</span><span class="p">,</span> <span class="n">simpson</span>
+<span class="k">implicit none</span>
+<span class="k">private</span>
+
+<span class="k">public</span> <span class="kd">::</span> <span class="n">foo</span>
+
+<span class="k">type</span><span class="p">,</span> <span class="k">extends</span><span class="p">(</span><span class="n">integrand</span><span class="p">)</span> <span class="kd">::</span> <span class="n">my_integrand</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">dp</span><span class="p">)</span> <span class="kd">::</span> <span class="n">a</span><span class="p">,</span> <span class="n">k</span>
+<span class="k">contains</span>
+<span class="k">    procedure</span> <span class="kd">::</span> <span class="n">eval</span> <span class="o">=&gt;</span> <span class="n">f</span>
+<span class="k">end type</span>
+
+<span class="k">contains</span>
+
+<span class="k">function </span><span class="n">f</span><span class="p">(</span><span class="n">this</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="k">result</span><span class="p">(</span><span class="n">fx</span><span class="p">)</span>
+<span class="k">class</span><span class="p">(</span><span class="n">my_integrand</span><span class="p">)</span> <span class="kd">::</span> <span class="n">this</span>
+<span class="kt">real</span><span class="p">(</span><span class="n">dp</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span> <span class="kd">::</span> <span class="n">x</span>
+<span class="kt">real</span><span class="p">(</span><span class="n">dp</span><span class="p">)</span> <span class="kd">::</span> <span class="n">fx</span>
+<span class="n">fx</span> <span class="o">=</span> <span class="n">this</span><span class="p">%</span><span class="n">a</span><span class="o">*</span><span class="nb">sin</span><span class="p">(</span><span class="n">this</span><span class="p">%</span><span class="n">k</span><span class="o">*</span><span class="n">x</span><span class="p">)</span>
+<span class="k">end function</span>
+
+<span class="k">subroutine </span><span class="n">foo</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span>
+<span class="kt">real</span><span class="p">(</span><span class="n">dp</span><span class="p">)</span> <span class="kd">::</span> <span class="n">a</span><span class="p">,</span> <span class="n">k</span>
+<span class="k">type</span><span class="p">(</span><span class="n">my_integrand</span><span class="p">)</span> <span class="kd">::</span> <span class="n">my_f</span>
+<span class="n">my_f</span><span class="p">%</span><span class="n">a</span> <span class="o">=</span> <span class="n">a</span>
+<span class="n">my_f</span><span class="p">%</span><span class="n">k</span> <span class="o">=</span> <span class="n">k</span>
+<span class="k">print</span> <span class="o">*</span><span class="p">,</span> <span class="n">simpson</span><span class="p">(</span><span class="n">my_f</span><span class="p">,</span> <span class="mf">0.0_dp</span><span class="p">,</span> <span class="mf">1.0_dp</span><span class="p">)</span>
+<span class="k">print</span> <span class="o">*</span><span class="p">,</span> <span class="n">simpson</span><span class="p">(</span><span class="n">my_f</span><span class="p">,</span> <span class="mf">0.0_dp</span><span class="p">,</span> <span class="mf">2.0_dp</span><span class="p">)</span>
+<span class="k">end subroutine</span>
+
+<span class="k">end module</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="complete-example-of-void-vs-type-c-ptr-and-transfer">
+<h3>Complete Example of void * vs type(c_ptr) and transfer()<a class="headerlink" href="#complete-example-of-void-vs-type-c-ptr-and-transfer" title="Permalink to this headline">¶</a></h3>
+<p>Here are three equivalent codes: one in C using <code class="docutils literal notranslate"><span class="pre">void</span> <span class="pre">*</span></code> and two codes in
+Fortran using <code class="docutils literal notranslate"><span class="pre">type(c_ptr)</span></code> and <code class="docutils literal notranslate"><span class="pre">transfer()</span></code>:</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 15%" />
+<col style="width: 28%" />
+<col style="width: 57%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Language</p></th>
+<th class="head"><p>Method</p></th>
+<th class="head"><p>Link</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>C</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">void</span> <span class="pre">*</span></code></p></td>
+<td><p><a class="reference external" href="https://gist.github.com/1665641">https://gist.github.com/1665641</a></p></td>
+</tr>
+<tr class="row-odd"><td><p>Fortran</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">type(c_ptr)</span></code></p></td>
+<td><p><a class="reference external" href="https://gist.github.com/1665626">https://gist.github.com/1665626</a></p></td>
+</tr>
+<tr class="row-even"><td><p>Fortran</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">transfer()</span></code></p></td>
+<td><p><a class="reference external" href="https://gist.github.com/1665630">https://gist.github.com/1665630</a></p></td>
+</tr>
+</tbody>
+</table>
+<p>The C code uses the standard C approach for writing extensible libraries that
+accept callbacks and contexts. The two Fortran codes show how to do the same.
+The <code class="docutils literal notranslate"><span class="pre">type(c_ptr)</span></code> method is equivalent to the C version and that is the
+approach that should be used.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">transfer()</span></code> method is here for completeness only (before Fortran 2003,
+it was the only way) and it is a little cumbersome, because the user needs to
+create auxiliary conversion functions for each of his types.
+As such, the <code class="docutils literal notranslate"><span class="pre">type(c_ptr)</span></code> method should be used instead.</p>
+</div>
+</div>
+<div class="section" id="parallel-programming">
+<span id="parallel"></span><h2>Parallel programming<a class="headerlink" href="#parallel-programming" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="openmp">
+<h3>OpenMP<a class="headerlink" href="#openmp" title="Permalink to this headline">¶</a></h3>
+<p><a class="reference external" href="http://www.openmp.org/">OpenMP</a> should be compatible with
+non-openMP compilers. This can be enforced by prepending all
+OpenMP-specific calls by <code class="docutils literal notranslate"><span class="pre">!\$</span></code>. Regular compilers will consider these
+lines as comments and ignore them. For OpenMP compilers, these lines
+will be considered as regular Fortran code. The following code</p>
+<div class="highlight-fortran notranslate"><div class="highlight"><pre><span></span><span class="k">program </span><span class="n">test_openmpi</span>
+   <span class="c">!\$ use omp_lib</span>
+   <span class="k">implicit none</span>
+
+<span class="k">   </span><span class="kt">integer</span> <span class="kd">::</span> <span class="n">nthreads</span>
+
+   <span class="n">nthreads</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+   <span class="c">!\$ nthreads = omp_get_num_threads()</span>
+
+   <span class="c">! will print the number of running threads when compiled with OpenMP, else will print -1</span>
+   <span class="k">print</span><span class="o">*</span><span class="p">,</span> <span class="s2">&quot;nthreads=&quot;</span><span class="p">,</span> <span class="n">nthreads</span>
+<span class="k">end program</span>
+</pre></div>
+</div>
+<p>will print the number of threads used when compiled with OpenMP. It will print by default -1 if compiled without OpenMP.</p>
+</div>
+<div class="section" id="mpi">
+<h3>MPI<a class="headerlink" href="#mpi" title="Permalink to this headline">¶</a></h3>
+<p>There are three ways of including MPI in a fortran program:</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 15%" />
+<col style="width: 19%" />
+<col style="width: 66%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Fortran version</p></th>
+<th class="head"><p>Method</p></th>
+<th class="head"><p>Comments</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Fortran 08</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">use</span> <span class="pre">mpi_f08</span></code></p></td>
+<td><p>Consistent with F08 standard, good type-checking; highly recommended</p></td>
+</tr>
+<tr class="row-odd"><td><p>Fortran 90</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">use</span> <span class="pre">mpi</span></code></p></td>
+<td><p>Not consistent with standard, so-so type-checking; not recommended</p></td>
+</tr>
+<tr class="row-even"><td><p>Fortran 77</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">include</span> <span class="pre">&quot;mpif.h&quot;</span></code></p></td>
+<td><p>Not consistent with standard, no type-checking; strongly discouraged</p></td>
+</tr>
+</tbody>
+</table>
+<p>On infrastructures where <code class="docutils literal notranslate"><span class="pre">use</span> <span class="pre">mpi_f08</span></code> is not available, one should
+fallback to <code class="docutils literal notranslate"><span class="pre">use</span> <span class="pre">mpi</span></code>. The use of <code class="docutils literal notranslate"><span class="pre">include</span> <span class="pre">&quot;mpif.h&quot;</span></code> is strongly
+discouraged, as it does not check at all the types of the argument or
+that the function calls provide the good arguments. For example, you
+don’t get any compiler warnings if you call a subroutine and forget a
+parameter, add an extra parameter, or pass a parameter of the wrong
+type. It may also lead to silent data corruption.</p>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Fortran Best Practices</a><ul>
+<li><a class="reference internal" href="#fortran-style-guide">Fortran Style Guide</a><ul>
+<li><a class="reference internal" href="#naming-convention">Naming Convention</a></li>
+<li><a class="reference internal" href="#indentation">Indentation</a></li>
+<li><a class="reference internal" href="#comparison-to-other-languages">Comparison to Other Languages</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#floating-point-numbers">Floating Point Numbers</a></li>
+<li><a class="reference internal" href="#integer-division">Integer Division</a></li>
+<li><a class="reference internal" href="#modules-and-programs">Modules and Programs</a></li>
+<li><a class="reference internal" href="#arrays">Arrays</a></li>
+<li><a class="reference internal" href="#multidimensional-arrays">Multidimensional Arrays</a></li>
+<li><a class="reference internal" href="#element-wise-operations-on-arrays-using-subroutines-functions">Element-wise Operations on Arrays Using Subroutines/Functions</a></li>
+<li><a class="reference internal" href="#allocatable-arrays">Allocatable Arrays</a></li>
+<li><a class="reference internal" href="#file-input-output">File Input/Output</a></li>
+<li><a class="reference internal" href="#interfacing-with-c">Interfacing with C</a></li>
+<li><a class="reference internal" href="#interfacing-with-python">Interfacing with Python</a><ul>
+<li><a class="reference internal" href="#using-cython">Using Cython</a></li>
+<li><a class="reference internal" href="#using-ctypes">Using ctypes</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#callbacks">Callbacks</a></li>
+<li><a class="reference internal" href="#type-casting-in-callbacks">Type Casting in Callbacks</a><ul>
+<li><a class="reference internal" href="#i-work-arrays">I: Work Arrays</a></li>
+<li><a class="reference internal" href="#ii-general-structure">II: General Structure</a></li>
+<li><a class="reference internal" href="#iii-private-module-variables">III: Private Module Variables</a></li>
+<li><a class="reference internal" href="#iv-nested-functions">IV: Nested functions</a></li>
+<li><a class="reference internal" href="#v-using-type-c-ptr-pointer">V: Using type(c_ptr) Pointer</a></li>
+<li><a class="reference internal" href="#vi-transfer-intrinsic-function">VI: transfer() Intrinsic Function</a></li>
+<li><a class="reference internal" href="#vii-object-oriented-approach">VII: Object Oriented Approach</a></li>
+<li><a class="reference internal" href="#complete-example-of-void-vs-type-c-ptr-and-transfer">Complete Example of void * vs type(c_ptr) and transfer()</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#parallel-programming">Parallel programming</a><ul>
+<li><a class="reference internal" href="#openmp">OpenMP</a></li>
+<li><a class="reference internal" href="#mpi">MPI</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="about.html"
+                        title="previous chapter">About</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="rosetta.html"
+                        title="next chapter">Python Fortran Rosetta Stone</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/src/best-practices.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="rosetta.html" title="Python Fortran Rosetta Stone"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="about.html" title="About"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Fortran90 1.0 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2024, Ondřej Čertík.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.4.4.
+    </div>
+  </body>
+</html>
